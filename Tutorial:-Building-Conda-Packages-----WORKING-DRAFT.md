@@ -12,12 +12,14 @@ Presently, we're focused on bundling packages for Linux. Mac OS X and Windows pa
 Basic Concepts
 ==============
 
-The following assumes comfort navigating the *NIX command line and doing routine shell script editing and file manipulation. We'll touch on some important concepts and resources you may want to read up on if you encounter something unfamiliar.
+The following assumes comfort navigating the UNIX command line and doing routine shell script editing and file/ directory manipulation. We'll touch on some important concepts and resources you may want to read up on if you encounter something unfamiliar.
 
-Dynamic Linking in One Paragraph
+Linking - Why are we doing this?
 --------------------------------
 
-Why does conda exist? To address a problem that comes about because executables are dynamically linked, meaning they depend on already-compiled libraries that are invoked at runtime. These libraries may be system-level utilities, math packages, or ancillary self-contained tools (like a visualization package). Many applications depend on software like this, which can itself take up a lot of space and involve other dependencies which make it complicated to install. Therefore, it's a desirable model 
+Why does conda exist? To address a problem that comes about because executables depend on already-compiled libraries that are linked against at runtime. These libraries may be system-level utilities, math packages, or ancillary self-contained tools (like a visualization package). Many applications depend on software like this, which can itself take up a lot of space and involve other dependencies which make it complicated to install. Therefore, it's a desirable model to build software that makes use of already-existing software, rather than recompiling every time.
+
+The challenge contained here is that your software must be able to locate compatible builds to link against. If a link target can't be located or is an outdated version, the software fails. conda provides a solution to manage controlled, reproducible environments in which to run software with complex dependencies.
 
 Preliminaries
 =============
@@ -32,11 +34,12 @@ Install conda and conda-build
 -----------------------------
 
 conda is installed as part of Continuum's Anaconda distribution and used to manage changes thereto. A lightweight [python + conda standalone distribution](http://conda.pydata.org/miniconda.html) is also available, which is what we'll assume here. Upon downloading the installer script, run it in a working directory:
+
 `$ ./Miniconda-3.3.0-Linux-x86.sh`
 
-A fundamental design philosophy of conda is that users should have a fully functioning developer programming environment in their `home` or working directory without requiring administrative privileges or disrupting system- or root-level software installations.
+A fundamental design philosophy of conda is that users should have a fully functioning programming environment in their home or working directory without requiring administrative privileges or disrupting system- or root-level software installations. Therefore you will not need administrative access to run conda or manage conda environments. Building conda packages may, however require administrative privileges in certain cases.
 
-Provide the script with your choices about where to install conda and whether or not the path will be added to your environment. I assume it is added to the path; otherwise you will have to know the explicit path to your conda executable.
+Provide the script with your choices about where to install conda and whether or not the path will be added to your environment. I will assume it is added to the path; otherwise you will have to know the explicit path to your conda executable.
 
 Once conda is installed, relaunch a terminal window or issue
 
@@ -46,7 +49,7 @@ and confirm that
 
 `$ which conda`
 
-finds the executable where you have just installed it.
+finds the executable where you have just installed it. If you did not prepend the conda path (which is the default), the `which` command will not find the conda executable. You'll have to supply its path explicitly or create a soft link, etc.
 
 It's a useful habit to do
 
