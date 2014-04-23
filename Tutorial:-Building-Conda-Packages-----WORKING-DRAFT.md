@@ -13,3 +13,24 @@ Basic Concepts
 ==============
 
 The following assumes comfort navigating the *NIX command line and doing routine shell script editing and file manipulation. We'll touch on some important concepts and resources you may want to read up on if you encounter something unfamiliar.
+
+Dynamic Linking in One Paragraph
+--------------------------------
+
+Why does conda exist? To address a problem that comes about because executables are dynamically linked, meaning they depend on already-compiled libraries that are invoked at runtime. These libraries may be system-level utilities, math packages, or ancillary self-contained tools (like a visualization package). Many applications depend on software like this, which can itself take up a lot of space and involve other dependencies which make it complicated to install. Therefore, it's a desirable model 
+
+Preliminaries
+=============
+
+If any of the following are not installed in your Linux environment, you will want to install them:
+
+'sudo apt-get install chrpath'
+'sudo apt-get install git'
+
+Install Conda
+-------------
+
+conda is installed as part of Continuum's Anaconda distribution and used to manage changes thereto. A lightweight [python + conda standalone distribution](http://conda.pydata.org/miniconda.html) is also available, which is what we'll assume here. Upon downloading the installer script, run it in a working directory:
+'>./Miniconda-3.3.0-Linux-x86.sh'
+
+A fundamental design philosophy of conda is that users should have a fully functioning developer programming environment in their 'home' or working directory without requiring administrative privileges or disrupting system- or root-level software installations).
