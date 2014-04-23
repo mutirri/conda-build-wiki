@@ -76,21 +76,126 @@ will establish a copy of the conda-recipes repository on your local disk.
 
 Elementary conda Package Building
 =================================
-The simplest examples are very simple. With a correct meta.yaml file, this can be a one-liner:
+Trivial
+-------
+The simplest examples are very simple. With a correct meta.yaml file and a properly bundled binary distribution hosted on binstar, this can be a one-liner (e.g. Trent's ppt demo with pyfaker):
 
 `$ conda build .`
 
 What are other approaches that people might try, with roughly increasing complexity?
 
-Using conda skeleton to build from pypi
----------------------------------------
+Using conda skeleton to build from a PyPi package
+-------------------------------------------------
+Confirm that the package is hosted by PyPi. Here I use the music21 package, based on a recent request on the [Anaconda] support list. It turns out this has already been packaged for conda, but it serves its purpose here.
 
-Building from locally installed software
-----------------------------------------
+`$ pip install music21 -E ~/miniconda_local`
 
-Weird Stuff
+Here miniconda_local is the top_level directory where I've installed my conda distribution. Explicitly, the conda and conda-managed python executables are in miniconda_local/bin. The -E flag specifies the path extension of the python distribution into which the package should be installed (it will default to /usr otherwise, but you want it to be part of the conda-managed environment).
+
+If this goes well, you now have an installed music21 package from which to build a conda package:
+
+`$ conda skeleton pypi music21 --no-download`
+
+The --no-download flag simply prevents the tarball from being downloaded again, to save a couple minutes, since we just did that. You should verify the existence of the meta.yaml, build.sh, and bld.bat files in a newly created directory called music21.
+
+Now, it should be straightforward to use the conda-build tool. Let's try it:
+
+`$ cd music21`
+`$ conda build .`
+
+The workflow and file management can be a nuisance here. Specifically my build effort failed because a music21 tarball (due to the skeleton command or a partially successful conda build command??) was already sitting in miniconda_local/conda-bld/src_cache. Apparently then conda build could not write this file and bailed with a messy and unclear error. Moving that muci21*tar.gz file out of there resolved the issue. **This tutorial should be sequenced in such a way that the workflow is better and that conflict is avoided.**
+
+That worked.
+
+Although if I now `$ conda install pkgs/music21-1.8.1-py27_0.tar.bz2` using the package I just built it fails with
+
+`shutil.Error: `pkgs/music21-1.8.1-py27_0.tar.bz2` and `/home/gergely/code/miniconda/pkgs/music21-1.8.1-py27_0.tar.bz2` are the same file`
+
+Why is that not a sensible thing to do at this point?
+
+Writing meta.yaml by hand
+-------------------------
+Suppose we stick with the same package, music21, but don't start from the pip installation. We can use common sense values for the meta.yaml fields, based on other conda recipes and information about where to download the tarball. To furnish a detailed failure mode, I'll take the meta.yaml file from the pyfaker package:
+
+`package:
+  name: pyfaker
+  version: 0.3.2
+
+source:
+  git_tag: 0.3.2
+  git_url: https://github.com/tpn/faker.git
+
+requirements:
+  build:
+    - python
+    - distribute
+
+  run:
+    - python
+
+test:
+  imports:
+    - faker
+
+about:
+  home: http://www.joke2k.net/faker
+  license: MIT`
+
+With a search on github and some sensible choices for substitutions, I get a makeshift .yaml for music21:
+
+`package:
+  name: music21
+  version: 1.8.1
+
+source:
+  git_tag: 1.8.1
+  git_url: https://github.com/cuthbertLab/music21/releases/download/v1.8.1/music21-1.8.1.tar.gz
+
+requirements:
+  build:
+    - python
+    - distribute
+
+  run:
+    - python
+
+test:
+  imports:
+    - music21
+
+about:
+  home: https://github.com/cuthbertLab/music21
+  license: LGPL'
+
+This seems reasonable. Being sure to supply build.sh and bld.bat files in the same directory, I try
+
+`$ conda build .`
+
+and get a 403 error trying to access the repository. Now, with the benefit of comparison with the skeleton-generated file, I observe that the key difference is in the keywords that specify the git repository:
+
+` fn: music21-1.8.1.tar.gz
+  url: https://github.com/cuthbertLab/music21/releases/download/v1.8.1/music21-1.8.1.tar.gz'
+
+versus
+
+` git_tag: 1.8.1
+  git_url: https://github.com/cuthbertLab/music21/releases/download/v1.8.1/music21-1.8.1.tar.gz'
+
+**What is the significance of this difference, and how should I know which set of keywords to use?** But with this substitution, it works, and I have a conda package as desired.
+
+Building from locally compiled source distribution
+--------------------------------------------------
+**The next step will be building from source without the training wheels of skeleton or pip. Perhaps this is the place to slot in the continuum library?**
+
+Issues/ Weird Stuff/ Needs Attention
 ===========
-conda-build splashes error asking for `conda install jinja2` to enable jinja template support. Build proceeds to completion without, but fails if it's installed with an error `unable to load pkg_resources`.
+* conda-build splashes error asking for `conda install jinja2` to enable jinja template support. Build proceeds to completion without, but fails if it's installed with an error `unable to load pkg_resources`.
 
-Difference/ relationship between `conda build .` and `conda-build .`?
+* Difference/ relationship between `conda build .` and `conda-build .`?
 
+* How should a user intelligently search for existing packages without advance knowledge of all the channels they ought to search. Is there a utility that crawls binstar or a protocol for package builders to register their packages in a central place that can be accessed by conda search (if particular channels have not already been added)?
+
+References
+==========
+[Using PyPi packages for conda](http://www.linkedin.com/today/post/article/20140107182855-25278008-using-pypi-packages-with-conda)
+[music21 inquiry on support list](https://groups.google.com/a/continuum.io/forum/#!searchin/anaconda/conda$20package/anaconda/yu2ZKPI3ixU/VSWejiDoXlQJ)
