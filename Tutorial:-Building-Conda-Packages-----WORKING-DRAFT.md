@@ -76,6 +76,17 @@ will establish a copy of the conda-recipes repository on your local disk.
 
 Elementary conda Package Building
 =================================
+The simplest examples are very simple. With a correct meta.yaml file, this can be a one-liner:
+
+`$ conda build .`
+
+What are other approaches that people might try, with roughly increasing complexity?
+
+Using conda skeleton to build from pypi
+---------------------------------------
+
+Building from locally installed software
+----------------------------------------
 
 Weird Stuff
 ===========
