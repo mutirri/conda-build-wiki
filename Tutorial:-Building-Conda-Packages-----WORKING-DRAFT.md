@@ -53,7 +53,7 @@ finds the executable where you have just installed it. If you did not prepend th
 
 It's a useful habit to do
 
-` $conda update conda`
+`$ conda update conda`
 
 with a fresh install. You can issue to update command for any installed package, including conda itself. This intrinsic bootstrapping capacity makes conda very powerful. In fact, if you started with the miniconda installation, you can expand it to the full Anaconda distribution with
 
@@ -101,15 +101,16 @@ The --no-download flag simply prevents the tarball from being downloaded again, 
 Now, it should be straightforward to use the conda-build tool. Let's try it:
 
 `$ cd music21`
+
 `$ conda build .`
 
-The workflow and file management can be a nuisance here. Specifically my build effort failed because a music21 tarball (due to the skeleton command or a partially successful conda build command??) was already sitting in miniconda_local/conda-bld/src_cache. Apparently then conda build could not write this file and bailed with a messy and unclear error. Moving that muci21*tar.gz file out of there resolved the issue. **This tutorial should be sequenced in such a way that the workflow is better and that conflict is avoided.**
+The workflow and file management can be a nuisance here. Specifically my build effort failed because a music21 tarball (due to the skeleton command or a partially successful conda build command??) was already sitting in miniconda_local/conda-bld/src_cache. Apparently then conda build could not write this file and bailed with a messy and unclear error. Moving that music21*tar.gz file out of there resolved the issue. **This tutorial should be sequenced in such a way that the workflow is better and that conflict is avoided.**
 
 That worked.
 
 Although if I now `$ conda install pkgs/music21-1.8.1-py27_0.tar.bz2` using the package I just built it fails with
 
-`shutil.Error: `pkgs/music21-1.8.1-py27_0.tar.bz2` and `/home/gergely/code/miniconda/pkgs/music21-1.8.1-py27_0.tar.bz2` are the same file`
+`shutil.Error: \`pkgs/music21-1.8.1-py27_0.tar.bz2\` and \`/home/gergely/code/miniconda/pkgs/music21-1.8.1-py27_0.tar.bz2\` are the same file`
 
 Why is that not a sensible thing to do at this point?
 
