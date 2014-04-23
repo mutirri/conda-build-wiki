@@ -73,3 +73,10 @@ will establish a copy of the conda-recipes repository on your local disk.
 
 Elementary conda Package Building
 =================================
+
+Weird Stuff
+===========
+conda-build splashes error asking for `conda install jinja2` to enable jinja template support. Build proceeds to completion without, but fails if it's installed with an error `unable to load pkg_resources`.
+
+Difference/ relationship between `conda build .` and `conda-build .`?
+
