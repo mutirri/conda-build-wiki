@@ -110,9 +110,9 @@ That worked.
 
 Although if I now `$ conda install pkgs/music21-1.8.1-py27_0.tar.bz2` using the package I just built it fails with
 
-`shutil.Error: \`pkgs/music21-1.8.1-py27_0.tar.bz2\` and \`/home/gergely/code/miniconda/pkgs/music21-1.8.1-py27_0.tar.bz2\` are the same file`
+shutil.Error:\`pkgs/music21-1.8.1-py27_0.tar.bz2\` and \`/home/gergely/code/miniconda/pkgs/music21-1.8.1-py27_0.tar.bz2\` are the same file`
 
-Why is that not a sensible thing to do at this point?
+**Why is that not a sensible thing to do at this point?**
 
 Writing meta.yaml by hand
 -------------------------
