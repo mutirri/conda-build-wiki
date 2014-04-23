@@ -118,54 +118,78 @@ Writing meta.yaml by hand
 Suppose we stick with the same package, music21, but don't start from the pip installation. We can use common sense values for the meta.yaml fields, based on other conda recipes and information about where to download the tarball. To furnish a detailed failure mode, I'll take the meta.yaml file from the pyfaker package:
 
 `package:
+
   name: pyfaker
+
   version: 0.3.2
 
 source:
+
   git_tag: 0.3.2
+
   git_url: https://github.com/tpn/faker.git
 
 requirements:
+
   build:
+
     - python
+
     - distribute
 
   run:
+
     - python
 
 test:
+
   imports:
+
     - faker
 
 about:
+
   home: http://www.joke2k.net/faker
+
   license: MIT`
 
 With a search on github and some sensible choices for substitutions, I get a makeshift .yaml for music21:
 
 `package:
+
   name: music21
+
   version: 1.8.1
 
 source:
+
   git_tag: 1.8.1
+
   git_url: https://github.com/cuthbertLab/music21/releases/download/v1.8.1/music21-1.8.1.tar.gz
 
 requirements:
+
   build:
+
     - python
+
     - distribute
 
   run:
+
     - python
 
 test:
+
   imports:
+
     - music21
 
 about:
+
   home: https://github.com/cuthbertLab/music21
-  license: LGPL'
+
+  license: LGPL`
 
 This seems reasonable. Being sure to supply build.sh and bld.bat files in the same directory, I try
 
@@ -174,12 +198,14 @@ This seems reasonable. Being sure to supply build.sh and bld.bat files in the sa
 and get a 403 error trying to access the repository. Now, with the benefit of comparison with the skeleton-generated file, I observe that the key difference is in the keywords that specify the git repository:
 
 ` fn: music21-1.8.1.tar.gz
-  url: https://github.com/cuthbertLab/music21/releases/download/v1.8.1/music21-1.8.1.tar.gz'
+
+  url: https://github.com/cuthbertLab/music21/releases/download/v1.8.1/music21-1.8.1.tar.gz`
 
 versus
 
 ` git_tag: 1.8.1
-  git_url: https://github.com/cuthbertLab/music21/releases/download/v1.8.1/music21-1.8.1.tar.gz'
+
+  git_url: https://github.com/cuthbertLab/music21/releases/download/v1.8.1/music21-1.8.1.tar.gz`
 
 **What is the significance of this difference, and how should I know which set of keywords to use?** But with this substitution, it works, and I have a conda package as desired.
 
