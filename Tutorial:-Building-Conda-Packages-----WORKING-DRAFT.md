@@ -24,13 +24,14 @@ Preliminaries
 
 If any of the following are not installed in your Linux environment, you will want to install them:
 
-'sudo apt-get install chrpath'
-'sudo apt-get install git'
+`sudo apt-get install chrpath`
+
+`sudo apt-get install git`
 
 Install Conda
 -------------
 
 conda is installed as part of Continuum's Anaconda distribution and used to manage changes thereto. A lightweight [python + conda standalone distribution](http://conda.pydata.org/miniconda.html) is also available, which is what we'll assume here. Upon downloading the installer script, run it in a working directory:
-'>./Miniconda-3.3.0-Linux-x86.sh'
+`>./Miniconda-3.3.0-Linux-x86.sh`
 
 A fundamental design philosophy of conda is that users should have a fully functioning developer programming environment in their 'home' or working directory without requiring administrative privileges or disrupting system- or root-level software installations).
