@@ -9,6 +9,11 @@ https://github.com/conda/conda-build/issues/83
 
 Questions
 =========
+1. Take a look at https://github.com/tpn/enversion-dist/blob/master/conda/apr-util-1.5.3/meta.yaml
+
+2. Note the requirements->build/run sections
+
+3. What exactly is being specified there?
 
 4. What are the implications of having '- apr' as a runtime requirement?
 
