@@ -119,39 +119,27 @@ Writing meta.yaml by hand
 Suppose we stick with the same package, music21, but don't start from the pip installation. We can use common sense values for the meta.yaml fields, based on other conda recipes and information about where to download the tarball. To furnish a detailed failure mode, I'll take the meta.yaml file from the pyfaker package:
 
     package:
-    
       name: pyfaker
-    
       version: 0.3.2
     
     source:
-    
       git_tag: 0.3.2
-    
       git_url: https://github.com/tpn/faker.git
     
     requirements:
-    
       build:
-    
         - python
-    
         - distribute
     
       run:
-    
         - python
     
     test:
-    
       imports:
-    
         - faker
     
     about:
-    
       home: http://www.joke2k.net/faker
-    
       license: MIT
 
 With a search on github and some sensible choices for substitutions, I get a makeshift .yaml for music21:
