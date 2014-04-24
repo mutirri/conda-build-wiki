@@ -175,12 +175,12 @@ This seems reasonable. Being sure to supply build.sh and bld.bat files in the sa
 and get a 403 error trying to access the repository. Now, with the benefit of comparison with the skeleton-generated file, I observe that the key difference is in the keywords that specify the git repository:
 
       fn: music21-1.8.1.tar.gz
-      url: https://github.com/cuthbertLab/music21/releases/download/v1.8.1/music21-1.8.1.tar.gz`
+      url: https://github.com/cuthbertLab/music21/releases/download/v1.8.1/music21-1.8.1.tar.gz
 
 versus
 
       git_tag: 1.8.1
-      git_url: https://github.com/cuthbertLab/music21/releases/download/v1.8.1/music21-1.8.1.tar.gz`
+      git_url: https://github.com/cuthbertLab/music21/releases/download/v1.8.1/music21-1.8.1.tar.gz
 
 **What is the significance of this difference, and how should I know which set of keywords to use?** But with this substitution, it works, and I have a conda package as desired.
 
