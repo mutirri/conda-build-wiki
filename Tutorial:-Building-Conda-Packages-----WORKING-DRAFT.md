@@ -196,6 +196,8 @@ Issues/ Weird Stuff/ Needs Attention
 
 * How should a user intelligently search for existing packages without advance knowledge of all the channels they ought to search. Is there a utility that crawls binstar or a protocol for package builders to register their packages in a central place that can be accessed by conda search (if particular channels have not already been added)?
 
+* I have seen versions of this question on the support lists. If a user needs to maintain a conda environment with additional packages outside of conda control, what is the best practice? Is it worth considering a model where conda tracks not only packages under its control but also dependencies and version compatibility of packages that exist in the environment but are not conda-installed? In other words, a developer may not be able to offer a conda package for their software for technical reasons, but they may still want to support package info so that conda can be aware of that package and give the user instructions about updates and maintaining compatibility.
+
 References
 ==========
 [Using PyPi packages for conda](http://www.linkedin.com/today/post/article/20140107182855-25278008-using-pypi-packages-with-conda)
