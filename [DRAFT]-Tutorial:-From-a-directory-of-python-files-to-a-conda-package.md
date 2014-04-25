@@ -151,6 +151,8 @@ by itself versus when it is invoked by conda build. This means debugging and hac
 If everything is set up right it is, as they say, as easy as
     $ conda build .
 
+
+** DISREGARD CONTENT BEYOND THIS POINT **
 6. Place the package in a repository on binstar
 -----------------------------------------------
 
