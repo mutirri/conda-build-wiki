@@ -155,10 +155,30 @@ If everything is set up right it is, as they say, as easy as
 ** DISREGARD CONTENT BEYOND THIS POINT **
 6. Place the package in a repository on binstar
 -----------------------------------------------
+An account on binstar is required; users can request an account at binstar.org. Once approved and set up, use the binstar command line utility:
+
+    $ conda install binstar
+    $ binstar login
+    $ binstar upload /home/gergely/code/miniconda/conda-bld/linux-32/continuum-0.1.0-py27_0.tar.bz2
 
 7. Add the channel and conda install
 ------------------------------------
+$ conda config --add channels johngergely
+$ conda install continuum
 
+It seems to work... but I think it's not right. This package seems to install but it's kind a hack. The way I got to this point requires an awkward kind of bootstrap.
+
+Initially all the source files are local, so once I've got setup.py tuned, I make a tarball. Then I set up the meta.yaml in a new directory without specifying a source (because it's all local, not in a repository yet) and copy the tarball there. I hack up the build.sh to unpack the local tarball and build from that.
+
+This is the thing that's packaged and hosted on binstar at the moment:
+https://binstar.org/johngergely/continuum/0.1.0/download/linux-32/continuum-0.1.0-py27_0.tar.bz2
+
+and it seems to work. BUT it doesn't conform to the steps laid out in the docs. The problem is, how do you specify a url in the meta.yaml for the initial conda build **before** the package is uploaded yet?
+
+Not sure what I'm mixing up here.
+
+
+**DISREGARD THE FOLLOWING**
 
  1859  ls
  1860  ls python-libcontinuum/
