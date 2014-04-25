@@ -109,29 +109,29 @@ This can be built from a local tarball. In that case, it needs to also be placed
 
     $ more meta.yaml
 
-> package:
->   name: continuum
->   version: 0.1.0
+    package:
+      name: continuum
+      version: 0.1.0
 
-> #source:
-> #  fn: 0.1.0
-> #  #url:
+    #source:
+    #  fn: 0.1.0
+    #  #url:
 
-> requirements:
->   build:
->     - python
->     - distribute
+    requirements:
+      build:
+        - python
+        - distribute
 
->   run:
->     - python
+      run:
+        - python
 
-> test:
->   imports:
->     - continuum
+    test:
+      imports:
+        - continuum
 
-> about:
->   home: https://github.com/tpn/python-libcontinuum
->   license: LGPL
+    about:
+      home: https://github.com/tpn/python-libcontinuum
+      license: LGPL
 
 Note that no source keynames are specified. This requires modifying build.sh to locate and situate the tarball correctly, along these lines:
 
