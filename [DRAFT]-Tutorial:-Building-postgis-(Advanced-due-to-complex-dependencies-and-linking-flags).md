@@ -94,3 +94,106 @@ For an individual doing this for their own purposes (and maintaining their own c
 `$sudo apt-get install postgresql`
 
 BUT if your goal is to bundle a built package and distribute it worry-free to your friends and other users, this is just punting on the real solution. If there aren't reliable conda packages available on binstar to satisfy the needed dependencies, you need to build those as well.
+
+Build postgresql Package
+------------------------
+    $ mkdir postgresql-9.3.4
+    $ ls
+    build.sh  meta.yaml
+    $ more build.sh
+
+    #!/bin/bash
+    
+    ./configure --prefix=$PREFIX
+    
+    make
+    make install
+
+    $ more meta.yaml
+package:
+  name: postgresql
+  version: 9.3.4
+
+source:
+  fn: postgresql-9.3.4.tar.gz
+  url: http://ftp.postgresql.org/pub/source/v9.3.4/postgresql-9.3.4.tar.gz
+
+build:
+  number: 0
+
+about:
+  home: http://www.postgresql.org
+  license: GPL2
+
+Build command history - to be formatted later
+=============================================
+Build postgresql
+----------------
+2034  mkdir postgresql-9.3.4
+ 2035  cd postgresql-9.3.4/
+ 2036  pd
+ 2037  pd ../../src/
+ 2038  ls
+ 2039  ls src_postgresql-9.3.4/
+ 2040  ll src_postgresql-9.3.4/
+ 2041  popd
+ 2042  mv ../../src/src_postgresql-9.3.4/meta.yaml .
+ 2043  mv ../../src/src_postgresql-9.3.4/build.sh .
+ 2044  ls
+ 2045  conda build .
+ 2046  conda update conda
+ 2047  vim meta.yaml 
+ 2048  conda build .
+ 2049  vim meta.yaml 
+ 2050  ls
+ 2051  ls ..
+ 2052  ls ../..
+ 2053  conda build .
+ 2054  binstar upload /home/gergely/code/miniconda/conda-bld/linux-32/postgresql-9.3.4-0.tar.bz2
+ 2055  conda info
+ 2056  conda search postgresql
+ 2057  conda install postgresql
+
+Return to build of postgis
+--------------------------
+ 2058  cd ..
+ 2059  ls
+ 2060  mkdir postgis-2.1.2
+ 2061  ls ..
+ 2062  ls ../postgis_2.1.2/
+ 2063  cp -r ../postgis_2.1.2/ .
+ 2064  ls
+ 2065  ls postgis_2.1.2/
+ 2066  ls postgis-2.1.2/
+ 2067  rm -rf postgis-2.1.2/
+ 2068  ls
+ 2069  cd postgis_2.1.2/
+ 2070  ls
+ 2071  vim build.sh 
+ 2072  vim meta.yaml 
+ 2073  conda build .
+
+ERROR - libxml2
+-----
+ 2074  conda install libxml2
+ 2075  conda build .
+
+ERROR - geos-config
+
+Install geos
+------------
+
+ 2024  mkdir geos-3.4.2
+ 2025  cd geos-3.4.2/
+ 2026  cp ../postgresql-9.3.4/meta.yaml .
+ 2027  cp ../postgresql-9.3.4/build.sh .
+ 2028  vim build.sh 
+ 2029  vim meta.yaml 
+ 2030  conda build .
+ 2031  binstar upload /home/gergely/code/miniconda/conda-bld/linux-32/geos-3.4.2-0.tar.bz2
+
+ERROR
+-----
+configure: error: could not find libgeos_c - you may need to specify the directory of a geos-config file using --with-geosconfig
+
+Need to update meta.yaml with requirements as they become clear. conda will help resolve these paths as dependencies are specified.
