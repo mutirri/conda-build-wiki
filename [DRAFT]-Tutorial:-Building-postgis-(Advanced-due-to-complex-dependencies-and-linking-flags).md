@@ -89,5 +89,8 @@ Now:
 
 Huh. This is a little confounding given what I read [here](https://binstar.org/trent/postgresql).
 
+For an individual doing this for their own purposes (and maintaining their own computing environments), the most efficient solution may be to install whatever pre-existing binaries are available. For example, I am able to find a binary of PostgreSQL for my Ubuntu OS and do
 
+`$sudo apt-get install postgresql`
 
+BUT if your goal is to bundle a built package and distribute it worry-free to your friends and other users, this is just punting on the real solution. If there aren't reliable conda packages available on binstar to satisfy the needed dependencies, you need to build those as well.
