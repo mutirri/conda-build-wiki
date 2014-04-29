@@ -197,3 +197,11 @@ ERROR
 configure: error: could not find libgeos_c - you may need to specify the directory of a geos-config file using --with-geosconfig
 
 Need to update meta.yaml with requirements as they become clear. conda will help resolve these paths as dependencies are specified.
+
+ERROR
+-----
+configure: error: could not find proj_api.h - you may need to specify the directory of a PROJ.4 installation using --with-projdir
+
+Build proj
+----------
+
