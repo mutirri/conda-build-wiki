@@ -1,25 +1,53 @@
 Introduction
 ============
+
 Overview
 --------
-Let's set out to build postgis. This package is installable with conda if you have access to an appropriate channel, so we are not flying blind. But we'll start out naively and try to learn some things along the way.
+
+Let's set out to build postgis. This package is installable with conda if you
+have access to an appropriate channel, so we are not flying blind. But we'll
+start out naively and try to learn some things along the way.
 
 We will build postgis 2.1.2 (the current version as of 30 April 2014).
 
-The step-by-step sequence is fairly repetitive in the sense that there are only a few sequences of actions you must take to build conda packages, although you may have to repeat them multiple times to build a package with many dependencies. You'll see once we get into the steps. First, let's lay out the abstract game plan. Understanding what we have to accomplish will demystify the process considerably.
+The step-by-step sequence is fairly repetitive in the sense that there are only
+a few sequences of actions you must take to build conda packages, although you
+may have to repeat them multiple times to build a package with many
+dependencies. You'll see once we get into the steps. First, let's lay out the
+abstract game plan. Understanding what we have to accomplish will demystify the
+process considerably.
 
 Abstract Description of conda build
 -----------------------------------
-We begin building a package by pointing conda to a directory with a build.sh (for Linux) and meta.yaml file. Respectively, these files specify the command line instructions to build a particular package from source, and information about where to download the source files and dependencies that the package requires. If these files are configured correctly, `$ conda build .` obtains the source files from the location specified in meta.yaml and, following the commands in build.sh, builds the package locally. During this process, conda generates metadata about the build and sets up relocatable links (relative to the local build) so that the package, once built, is transportable. Once complete, the package build plus all conda-created metadata is bundled and uploaded to binstar, where it can be access via `$ conda search` and `$ conda install` commands.
 
-Here, we'll start out naively and make adjustments to the build.sh and meta.yaml files as we go, until the package is successfully built.
+We begin building a package by pointing conda to a directory with a build.sh
+(for Linux) and meta.yaml file. Respectively, these files specify the command
+line instructions to build a particular package from source, and information
+about where to download the source files and dependencies that the package
+requires. If these files are configured correctly, `$ conda build .` obtains
+the source files from the location specified in meta.yaml and, following the
+commands in build.sh, builds the package locally. During this process, conda
+generates metadata about the build and sets up relocatable links (relative to
+the local build) so that the package, once built, is transportable. Once
+complete, the package build plus all conda-created metadata is bundled and
+uploaded to binstar, where it can be access via `$ conda search` and `$ conda
+install` commands.
+
+Here, we'll start out naively and make adjustments to the build.sh and
+meta.yaml files as we go, until the package is successfully built.
 
 Build Steps
 ===========
+
 Initial Setup
 -------------
-Locate source files for the package you want to build. In this case, I found a postgis [tarball](http://download.osgeo.org/postgis/source/postgis-2.1.2.tar.gz
-) here. Reading the documentation, I can already see there are dependencies, but for the purposes of illustrating the steps, we will start at zero and see how far we get.
+
+Locate source files for the package you want to build. In this case, I found a
+postgis
+[tarball](http://download.osgeo.org/postgis/source/postgis-2.1.2.tar.gz) here.
+Reading the documentation, I can already see there are dependencies, but for
+the purposes of illustrating the steps, we will start at zero and see how far
+we get.
 
 Create a directory where conda build will find the build.sh and meta.yaml files. Create files with the following bare-bones contents (appropriate to the package you are tyring to build):
 
@@ -29,12 +57,20 @@ Create a directory where conda build will find the build.sh and meta.yaml files.
     build.sh  meta.yaml
     $ more build.sh
     #!/bin/sh
-    
+
     ./configure --prefix=$PREFIX
     make
     make install
 
-This is the minimal set of commands that might build a package from source that was created with autotools (autoconf, automake, etc), the standard format you'll encounter for packaging source code distributions. Including `--prefix=$PREFIX` here tells `configure` to set the installation path to `$PREFIX`, an environment variable set by conda during runtime. This is a key instruction to have conda configure and install locally, rather than try to access root-level directories such as /usr, which is the default installation path. If you want to follow more details of what conda is doing to configure the environment, add to your buid.sh file
+This is the minimal set of commands that might build a package from source that
+was created with autotools (autoconf, automake, etc), the standard format
+you'll encounter for packaging source code distributions. Including
+`--prefix=$PREFIX` here tells `configure` to set the installation path to
+`$PREFIX`, an environment variable set by conda during runtime. This is a key
+instruction to have conda configure and install locally, rather than try to
+access root-level directories such as /usr, which is the default installation
+path. If you want to follow more details of what conda is doing to configure
+the environment, add to your buid.sh file
 
     echo $PREFIX
 
@@ -43,37 +79,48 @@ The basic meta.yaml file looks like this:
     package:
       name: postgis
       version: 2.1.2
-    
+
     source:
       fn: postgis-2.1.2.tar.gz
       url: http://download.osgeo.org/postgis/source/postgis-2.1.2.tar.gz
-    
+
     build:
       number: 0
-    
+
     #requirements:
     #  build:
     #
     #  run:
-    
+
     about:
       home: http://postgis.net
       license: GPL2
 
-The dependencies will be listed under the requirements key, but that is commented out for now as we are assuming no dependencies at first.
+The dependencies will be listed under the requirements key, but that is
+commented out for now as we are assuming no dependencies at first.
 
 First Build Attempt
 -------------------
+
 Try
     $ conda build .
 
-If you are familiar building packages from source, you will recognize the log generated by the configure script. The first error message I encounter is
-    configure: error: could not find pg_config within the current path. You may need to try re-running configure with a --with-pg_config parameter.
-    Command failed: /bin/bash -x -e /media/data/code/sandbox/postgis_2.1.2/build.sh
+If you are familiar building packages from source, you will recognize the log
+generated by the configure script. The first error message I encounter is
+configure: error: could not find pg_config within the current path. You may
+need to try re-running configure with a --with-pg_config parameter.  Command
+failed: /bin/bash -x -e /media/data/code/sandbox/postgis_2.1.2/build.sh
 
-I'm being asked to specify a path to the utility pg_config. I do `$ which pg_config` and find that it's not installed. The philosophy of conda packaging is that you bundle what you need, so this utility has to be included in the package. I do `$conda search pg_config` and turn up nothing. Therefore I have to assume this package also needs to be built.
+I'm being asked to specify a path to the utility pg_config. I do `$ which
+pg_config` and find that it's not installed. The philosophy of conda packaging
+is that you bundle what you need, so this utility has to be included in the
+package. I do `$conda search pg_config` and turn up nothing. Therefore I have
+to assume this package also needs to be built.
 
-Some searching indicates pg_config is distributed with postgresql, so let me check that out. A search on binstar.org for conda packages with the name `postgresql` yields some results. I'll try to install from one of the binstar channels. First the channel must be added with:
+Some searching indicates pg_config is distributed with postgresql, so let me
+check that out. A search on binstar.org for conda packages with the name
+`postgresql` yields some results. I'll try to install from one of the binstar
+channels. First the channel must be added with:
 
     $ conda config --add channels https://conda.binstar.org/trent
 
@@ -81,7 +128,7 @@ which I can verify by inspecting
 
     $ conda info
     Current conda install:
-    
+
                  platform : linux-32
             conda version : 3.4.2
            python version : 2.7.6.final.0
@@ -103,26 +150,34 @@ Now:
 
 Huh. This is a little confounding given what I read [here](https://binstar.org/trent/postgresql).
 
-**I haven't had much success accessing other user's channels. I'm not sure if this is supposed to be allowed or not.**
+**I haven't had much success accessing other user's channels. I'm not sure if
+this is supposed to be allowed or not.**
 
-For an individual doing this for their own purposes (and maintaining their own computing environments), the most efficient solution may be to install whatever pre-existing binaries are available. For example, I am able to find a binary of PostgreSQL for my Ubuntu OS and do
+For an individual doing this for their own purposes (and maintaining their own
+computing environments), the most efficient solution may be to install whatever
+pre-existing binaries are available. For example, I am able to find a binary of
+PostgreSQL for my Ubuntu OS and do
 
 `$sudo apt-get install postgresql`
 
-BUT if your goal is to bundle a built package and distribute it worry-free to your friends and other users, this is just punting on the real solution. If there aren't reliable conda packages available on binstar to satisfy the needed dependencies, you need to build those as well.
+BUT if your goal is to bundle a built package and distribute it worry-free to
+your friends and other users, this is just punting on the real solution. If
+there aren't reliable conda packages available on binstar to satisfy the needed
+dependencies, you need to build those as well.
 
 Build postgresql Package
 ------------------------
 we need to set up a new conda build directory for postgresql and copy in meta.yaml and build.sh files.
+
     $ cd postgresql-9.3.4
     $ ls
     build.sh  meta.yaml
     $ more build.sh
 
     #!/bin/bash
-    
+
     ./configure --prefix=$PREFIX
-    
+
     make
     make install
 
@@ -145,45 +200,54 @@ about:
 Once these are configured, do
     $ conda build .
 
-If the package successfully builds from source, and conda is able to complete its build, you will get a message about uploading the package to binstar so that it's accessible for installation. This is done with:
+If the package successfully builds from source, and conda is able to complete
+its build, you will get a message about uploading the package to binstar so
+that it's accessible for installation. This is done with:
 
     $ binstar upload /home/gergely/code/miniconda/conda-bld/linux-32/postgresql-9.3.4-0.tar.bz2
     $ conda search postgresql
     Fetching package metadata: ......
-    django-postgresql-manager    0.2.0                    py27_0  public          
-    postgresql                .  9.3.4                         0  johngergely   
+    django-postgresql-manager    0.2.0                    py27_0  public
+    postgresql                .  9.3.4                         0  johngergely
+
 allows me to verify that the package was uploaded to my binstar channel. Now I can install it:
 
     $ conda install postgresql
 
-Now I can return to the build of postgis. I know that postgresql (and specifically the need for pg_config) is a dependency, so I should include that in the meta.yaml file and add the flag --with-pgconfig to the configure command, as the script requested.
+Now I can return to the build of postgis. I know that postgresql (and
+specifically the need for pg_config) is a dependency, so I should include that
+in the meta.yaml file and add the flag --with-pgconfig to the configure
+command, as the script requested.
 
     $ more meta.yaml
     package:
       name: postgis
       version: 2.1.2
-    
+
     source:
       fn: postgis-2.1.2.tar.gz
       url: http://download.osgeo.org/postgis/source/postgis-2.1.2.tar.gz
-    
+
     build:
       number: 0
-      
+
     requirements:
       build:
         - postgresql
       run:
         - postgresql
-    
+
     about:
       home: http://postgis.net
       license: GPL2
-    
-And I have added the flag --with-pgconfig=$PREFIX/bin/pg_config to the configure command in build.sh. You can verify that pg_config is located in the bin directory specified, under your anaconda/miniconda build.
+
+And I have added the flag --with-pgconfig=$PREFIX/bin/pg_config to the
+configure command in build.sh. You can verify that pg_config is located in the
+bin directory specified, under your anaconda/miniconda build.
 
 ERROR - libxml2
 ---------------
+
 Try again:
     $ conda build .
 
@@ -197,7 +261,7 @@ I need to install libxml2. See if it's available:
     $ conda search libxml2
     Fetching package metadata: ......
     libxml2                   .  2.9.0                         0  defaults  
-    
+
     $ conda install libxml2
 
 I accordingly update the meta.yaml file to include `-libxml2` in the build and run requirements.
@@ -206,12 +270,14 @@ I accordingly update the meta.yaml file to include `-libxml2` in the build and r
 
 ERROR - geos-config
 -------------------
+
 The next error encountered is
 
     checking for geos-config... no
     configure: error: could not find geos-config within the current path. You may need to try re-running configure with a --with-geosconfig parameter.
 
-`$ conda search geos` does not turn up an available package, so I will build this from source, following the same routine we've done a couple times now.
+`$ conda search geos` does not turn up an available package, so I will build
+this from source, following the same routine we've done a couple times now.
 
     $ mkdir geos-3.4.2
     $ cd geos-3.4.2/
@@ -222,25 +288,27 @@ I edit the meta.yaml and build.sh files to reflect the details of this package (
 
     $ conda build .
     $ binstar upload /home/gergely/code/miniconda/conda-bld/linux-32/geos-3.4.2-0.tar.bz2
+
 after the package is successfully built.
 
     $ conda install geos
 
-gives me the package in my environment and I can continue, after adding the dependencies in meta.yaml. At this point the conda recipe files look like this.
+gives me the package in my environment and I can continue, after adding the
+dependencies in meta.yaml. At this point the conda recipe files look like this.
 
 dependency so that they look like this:
     $ more meta.yaml
 package:
       name: postgis
       version: 2.1.2
-    
+
     source:
       fn: postgis-2.1.2.tar.gz
       url: http://download.osgeo.org/postgis/source/postgis-2.1.2.tar.gz
-    
+
     build:
       number: 0
-      
+
     requirements:
       build:
         - postgresql
@@ -250,43 +318,55 @@ package:
         - postgresql
         - libxml2
         - geos
-    
+
     about:
       home: http://postgis.net
       license: GPL2
 
     $ more build.sh
     #!/bin/sh
-       
+
     ./configure \
         --prefix=$PREFIX \
         --with-pgconfig=$PREFIX/bin/pg_config \
         --with-geosconfig=$PREFIX/bin/geos-config \
-    
+
     make
     make install
 
 A Reminder
 ----------
-As you go through this cycle of steps, remember to update the conda build recipes to reflect the dependencies that you are installing. You may install packages, but if the build recipes dot reflect it, you will still encounter errors. For example, if you have installed a geos package but not specified the requirement in meta.yaml or the path flag in build.sh, you will see an error like this:
+
+As you go through this cycle of steps, remember to update the conda build
+recipes to reflect the dependencies that you are installing. You may install
+packages, but if the build recipes dot reflect it, you will still encounter
+errors. For example, if you have installed a geos package but not specified the
+requirement in meta.yaml or the path flag in build.sh, you will see an error
+like this:
 
     configure: error: could not find libgeos_c - you may need to specify the directory of a geos-config file using --with-geosconfig
 
 ERROR - proj
 ------------
+
 The next error I hit is
 
     configure: error: could not find proj_api.h - you may need to specify the directory of a PROJ.4 installation using --with-projdir
 
 Build proj
 ----------
-proj-4.8.0 can be built from source in the same way. It should not have non-standard dependencies. I uploaded my package as proj and then did `$ conda install proj`. I include -proj under requirements in meta.yaml and add the flag --with-projdir=$PREFIX in build.sh.
+
+proj-4.8.0 can be built from source in the same way. It should not have
+non-standard dependencies. I uploaded my package as proj and then did `$ conda
+install proj`. I include -proj under requirements in meta.yaml and add the flag
+--with-projdir=$PREFIX in build.sh.
 
     $ conda build .
 
 At this point the series of dependencies I have assembled is reflected by the conda build script's output:
+
     The following packages will be linked:
-    
+
         package                    |            build
         ---------------------------|-----------------
         geos-3.4.2                 |                0   hard-link
@@ -297,6 +377,7 @@ At this point the series of dependencies I have assembled is reflected by the co
 
 ERROR - gdal
 ------------
+
 Next I encounter:
     checking for gdal-config... no
     checking GDAL version... not found
@@ -305,20 +386,21 @@ Next I encounter:
 Is this package available?
     $ conda search gdal
     Fetching package metadata: ......
-    gdal                         1.10.1                   py33_0  defaults        
-                                 1.10.1                   py27_0  defaults        
-                                 1.10.1                   py26_0  defaults        
-                                 1.10.1               np18py34_2  defaults        
-                                 1.10.1               np18py33_2  defaults        
-                              .  1.10.1               np18py27_2  defaults        
-                                 1.10.1               np18py26_2  defaults        
-    gdaltokmz                    1.0                      py27_0  public          
+    gdal                         1.10.1                   py33_0  defaults
+                                 1.10.1                   py27_0  defaults
+                                 1.10.1                   py26_0  defaults
+                                 1.10.1               np18py34_2  defaults
+                                 1.10.1               np18py33_2  defaults
+                              .  1.10.1               np18py27_2  defaults
+                                 1.10.1               np18py26_2  defaults
+    gdaltokmz                    1.0                      py27_0  public
 
 Yes, so I can do
 
     $ conda install gdal
 
-and include -gdal as a requirement in meta.yaml, as well as add the flag `--with-gdalconfig=$PREFIX/bin` in build.sh.
+and include -gdal as a requirement in meta.yaml, as well as add the flag
+`--with-gdalconfig=$PREFIX/bin` in build.sh.
 
     $ conda build .
 
@@ -345,7 +427,10 @@ and that should be the one that works!
     # To have conda build upload to binstar automatically, use
     # $ conda config --set binstar_upload yes
 
-If you'd methodically followed along, you now have a postgis package you can upload and install. Along the way, you've created several other conda packages that may be useful in their own right.
+If you'd methodically followed along, you now have a postgis package you can
+upload and install. Along the way, you've created several other conda packages
+that may be useful in their own right.
 
-**One question is why my flags are not totally consistent with Trent's? Does this matter? How should one test discrepancies?**
+**One question is why my flags are not totally consistent with Trent's? Does
+this matter? How should one test discrepancies?**
 
