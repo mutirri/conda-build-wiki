@@ -8,7 +8,9 @@ goes into building conda packages.
 
 For a typical python-native binary package built in a Linux environment with
 
-`$ python setup.py build; python setup.py install`
+```
+$ python setup.py build; python setup.py install
+```
 
 conda packaging can be as simple as issuing a one-line command. Linked
 libraries are located relative to the binary (rather than referenced with
@@ -29,7 +31,7 @@ Basic Concepts
 ==============
 
 The following assumes comfort navigating the UNIX command line and doing
-routine shell script editing and file/ directory manipulation. We'll touch on
+routine shell script editing and file or directory manipulation. We'll touch on
 some important concepts and resources you may want to read up on if you
 encounter something unfamiliar.
 
@@ -56,20 +58,55 @@ Preliminaries
 
 If any of the following are not installed in your Linux environment, you will want to install them:
 
-`$ sudo apt-get install chrpath`
+```
+$ sudo apt-get install git
+$ sudo apt-get install chrpath
+```
 
-`$ sudo apt-get install git`
+if Your Linux distribution is Debian/Ubuntu, or if you use CentOS/RedHat/Fedora distro:
+
+```
+$ su
+```
+
+to become root, and then:
+
+```
+$ yum install git
+$ yum install chrpath
+$ exit
+```
+
+If `chrpath` tool is not available for your Linux distribution you can skip it for now.
+Later on you will have an another chance to do this, just after conda tool
+installation (this will be installation of `chrpath` from official conda
+repositories).
+
+Besides, during below building processes you will be asked to upload packages to
+(binstar.org)[https://binstar.org] hosting service. For now please just say no (or add
+`--no-binstar-upload` option to `build` conda's subcommand or `conda-build`
+command).
 
 Install conda and conda-build
 -----------------------------
 
-conda is installed as part of Continuum's Anaconda distribution and used to
-manage changes thereto. A lightweight [python + conda standalone
-distribution](http://conda.pydata.org/miniconda.html) is also available, which
-is what we'll assume here. Upon downloading the installer script, run it in a
-working directory:
+conda is installed as part of (Continuum's Anaconda)[https://store.continuum.io/cshop/anaconda/]
+distribution and used to manage changes thereto. A lightweight [python + conda
+standalone distribution](http://conda.pydata.org/miniconda.html) is also
+available, which is what we'll assume here. Upon downloading the installer
+script, make sure that this installer has appropriate permissions:
 
-`$ ./Miniconda-3.3.0-Linux-x86.sh`
+```
+$ chmod 755 Miniconda-3.5.2-Linux-x86_64.sh
+```
+
+and run it in a working directory:
+
+```
+$ ./Miniconda-3.5.2-Linux-x86_64.sh
+```
+
+The list of all `miniconda` releases is available (here)[http://repo.continuum.io/miniconda/].
 
 A fundamental design philosophy of conda is that users should have a fully
 functioning programming environment in their home or working directory without
@@ -83,192 +120,358 @@ or not the path will be added to your environment. I will assume it is added to
 the path; otherwise you will have to know the explicit path to your conda
 executable.
 
-Once conda is installed, relaunch a terminal window or issue
+Once conda is installed, relaunch a terminal window or issue:
 
-`$ source ~/.bashrc`
+```
+$ source ~/.bashrc
+```
 
-and confirm that
+and confirm that:
 
-`$ which conda`
+```
+$ which conda
+```
 
 finds the executable where you have just installed it. If you did not prepend
 the conda path (the default option), the `which` command will not find the
 conda executable. You'll have to supply its path explicitly or create a soft
 link, etc.
 
-It's a useful habit to do
+It's a useful habit to do:
 
-`$ conda update conda`
+```
+$ conda update conda
+```
 
 with a fresh install. You can issue to update command for any installed
 package, including conda itself. This intrinsic bootstrapping capacity makes
 conda very powerful. In fact, if you started with the miniconda installation,
-you can expand it to the full Anaconda distribution with
+you can expand it to the full (Anaconda
+distribution)[https://store.continuum.io/cshop/anaconda/] with:
 
-`$ conda install anaconda`
+```
+$ conda install anaconda
+```
 
 but that's not the focus here.
 
-What you do need to install is conda-build:
+What you do need to install is `conda-build` tool:
 
-`$ conda install conda-build`
+```
+$ conda install conda-build
+```
+
+Besides, you can now easily install `chrpath` tool. Just type:
+
+```
+$ conda install chrpath
+$ which chrpath
+```
+
+Relationship between conda build subcommand and conda-build command
+-------------------------------------------------------------------
+
+At the beginning the `build` conda's subcommand was directly implemented in
+itself code. During further development, implementation of this subcommand was
+moved to separate tool - `conda-build`. So, currently:
+
+```
+$ conda build
+```
+
+means to run (as wrapper):
+
+```
+$ conda-build
+```
 
 Clone conda-recipes from github
 -------------------------------
 
 This is not a necessary step to build your own packages, but it's a very useful
-resource to investigate already-built packages as a guide for your task ahead.
+resource to investigate already-built packages as a pretty good guide for your
+task ahead.
 
-`$ git clone https://github.com/conda/conda-recipes`
+```
+$ cd ~/
+$ git clone https://github.com/conda/conda-recipes
+```
 
-will establish a copy of the conda-recipes repository on your local disk.
+This will establish a copy of the conda-recipes repository on your local disk.
+After getting familiar with full process of package building, feel free to add
+your own new recipes to this repository by making a pull request.
 
 Elementary conda Package Building
 =================================
 
 Trivial
 -------
-The simplest examples are very simple. With a correct meta.yaml file and a
-properly bundled binary distribution hosted on binstar, this can be a one-liner
-(e.g. Trent's ppt demo with pyfaker):
 
-`$ conda build .`
+The simplest examples are very trivial. With a correct meta.yaml file and a
+properly bundled binary distribution hosted on
+(binstar.org)[https://binstar.org], this can be a one-liner (e.g. Trent's ppt
+demo with pyfaker):
 
-What are other approaches that people might try, with roughly increasing complexity?
+```
+$ cd ~/conda-recipes/pyfaker
+$ conda build .
+```
+
+The result of above operation - the package - will be saved in ~/miniconda/conda-bld/linux-64/music21-0.3.2-py27_0.tar.bz2 file.
+You can easily install this in global miniconda environment:
+
+```
+$ conda install ~/miniconda/conda-bld/linux-64/music21-0.3.2-py27_0.tar.bz2
+$ python
+$ python> import faker
+```
 
 Using conda skeleton to build from a PyPi package
 -------------------------------------------------
 
-Confirm that the package is hosted by PyPi. Here I use the music21 package,
-motivated by a [recent
+First, confirm that the package is hosted by (PyPi)[https://pypi.python.org/]. Here I
+use the `music21` package, motivated by a [recent
 request](https://groups.google.com/a/continuum.io/forum/#!searchin/anaconda/conda$20package/anaconda/yu2ZKPI3ixU/VSWejiDoXlQJ)
 on the [Anaconda support
 list](https://groups.google.com/a/continuum.io/forum/#!forum/anaconda). It
 turns out this has already been packaged for conda, but it serves its purpose
-as an example here.
+as an example here:
 
-`$ pip install music21 -E ~/miniconda_local`
+```
+$ conda create -n tstenv pip
+$ conda info -e
+```
 
-Here miniconda_local is the top_level directory where I've installed my conda
-distribution. Explicitly, the conda and conda-managed python executables are
-located in miniconda_local/bin. The -E flag specifies the path extension of the
-python distribution into which the package should be installed (it will default
-to /usr otherwise, but you want it to be part of the conda-managed
-environment).
+The above command creates virtual environment with pip tool installed inside it.
+Now I need to switch to just prepared environment by typing:
 
-If this goes well, you now have an installed music21 package from which to build a conda package:
+```
+$ source activate tstenv
+$ which pip
+```
 
-`$ conda skeleton pypi music21 --no-download`
+After that I can check `music21` package from PyPi)[https://pypi.python.org/]:
 
-The --no-download flag simply prevents the tarball from being downloaded again,
+```
+pip install --allow-all-external music21
+```
+
+In this particular case where `music21` sources are placed on a remote
+host (not on (PyPi)[https://pypi.python.org/] itself), the
+`--allow-all-external` option is mandatory.  Normally most packages sources are
+directly available on (PyPi)[https://pypi.python.org/], so mentioned option
+maybe omitted.
+
+To verify if a package was properly installed, please just type:
+
+```
+python
+```
+
+and then, inside the interpreter:
+
+
+```
+import music21
+```
+
+Don't bother about warning which says:
+
+```
+Certain music21 functions might need these optional packages: matplotlib, numpy, ...
+```
+
+At this point it doesn't matter. We just wanted to check if `music21` can be
+appropriately imported, and those packages are optional. If this goes well,
+you can remove our virtual environment:
+
+```
+$ source deactivate
+$ conda remove --all tstenv
+$ conda info -e
+```
+
+and generate a new conda recipe for `music21` package, by using (PyPi)[https://pypi.python.org/]] metadata:
+
+```
+$ cd ~/conda-recipes
+$ conda skeleton pypi music21 --no-download
+```
+
+The `--no-download` flag simply prevents the tarball from being downloaded again,
 to save a couple minutes, since we just did that. You should verify the
-existence of the meta.yaml, build.sh, and bld.bat files in a newly created
-directory called music21.
+existence of the `meta.yaml`, `build.sh`, and `bld.bat` files in a newly created
+directory called `music21`. Sometimes (like in this case - due to external place
+of sources) it is necessary to cut value of md5 sum from `fn:` and `url:`
+directives in `meta.yaml` file, to `md5:` directive:
 
-Now, it should be straightforward to use the conda-build tool. Let's try it:
+```
+source:
+  fn: music21-1.8.1.tar.gz#md5=b88f74b8a3940e4bca89d90158432ee0
+  url: https://github.com/cuthbertLab/music21/releases/download/v1.8.1/music21-1.8.1.tar.gz#md5=b88f74b8a3940e4bca89d90158432ee0
+  #md5: 
+```
 
-`$ cd music21`
+to:
 
-`$ conda build .`
+```
+source:
+  fn: music21-1.8.1.tar.gz
+  url: https://github.com/cuthbertLab/music21/releases/download/v1.8.1/music21-1.8.1.tar.gz
+  md5: b88f74b8a3940e4bca89d90158432ee0
+```
 
-The workflow and file management can be a nuisance here. Specifically my build
-effort failed because a music21 tarball (**due to the skeleton command or a
-partially successful conda build command??**) was already sitting in
-miniconda_local/conda-bld/src_cache. Apparently then conda build could not
-write this file and bailed with a messy and unclear error. Moving that
-music21*tar.gz file out of there resolved the issue. **This tutorial should be
-sequenced in such a way that the workflow is better and that conflict is
-avoided.**
+Generally speaking, User should always check saved in `meta.yaml` file output from the
+`skeleton` subcommand invocation.
 
-That worked.
+Now, it should be straightforward to use the `conda-build` tool. Let's try it:
 
-Although if I now `$ conda install pkgs/music21-1.8.1-py27_0.tar.bz2` using the
-package I just built it fails with
+```
+$ cd ~/conda-recipes/music21/
+$ conda build .
+```
 
-    shutil.Error: `pkgs/music21-1.8.1-py27_0.tar.bz2` and `/home/gergely/code/miniconda/pkgs/music21-1.8.1-py27_0.tar.bz2` are the same file`
+Above command throws me an error:
 
-**Why is that not a sensible thing to do at this point?**
+```
++ /home/irritum/anaconda/envs/_build/bin/python setup.py install
+Traceback (most recent call last):
+  File "setup.py", line 14, in <module>
+    from setuptools import setup, find_packages
+ImportError: No module named setuptools
+Command failed: /bin/bash -x -e /home/irritum/conda-recipes/music21/build.sh
+```
+
+So, now I should add appropriate requirement to auto generated `meta.yaml` file.
+To do this, I need to change:
+
+```
+requirements:
+  build:
+    - python
+```
+
+to:
+
+```
+requirements:
+  build:
+    - python
+    - setuptools
+```
+
+After above, I have re-run the command:
+
+```
+$ conda build .
+```
+
+Now everything works great and the package was saved to ~/miniconda/conda-bld/linux-64/music21-1.8.1-py27_0.tar.bz2 file.
+It's worth mentioning that during `TEST` phase of package it will be also placed in ~/miniconda/pkgs cache directory.
+But this file shouldn't be used directly by anyone except the `conda` tool internally.
+
+So, now I want to install `music21` package:
+
+```
+$ conda install ~/miniconda/conda-bld/linux-64/music21-1.8.1-py27_0.tar.bz
+$ python
+$ python> import music21
+```
+
+That's it :)
 
 Writing meta.yaml by hand
 -------------------------
 
-Suppose we stick with the same package, music21, but don't start from the pip
-installation. We can use common sense values for the meta.yaml fields, based on
+Suppose we stick with the same package, `music21`, but don't start from the pip
+installation. We can use common sense values for the `meta.yaml` fields, based on
 other conda recipes and information about where to download the tarball. To
-furnish a detailed failure mode, I'll take the meta.yaml file from the pyfaker
+furnish a detailed failure mode, I'll take the `meta.yaml` file from the `pyfaker`
 package:
 
-    package:
-      name: pyfaker
-      version: 0.3.2
+```
+package:
+  name: pyfaker
+  version: 0.3.2
 
-    source:
-      git_tag: 0.3.2
-      git_url: https://github.com/tpn/faker.git
+source:
+  git_tag: 0.3.2
+  git_url: https://github.com/tpn/faker.git
 
-    requirements:
-      build:
-        - python
-        - distribute
+requirements:
+  build:
+    - python
+    - setuptools
 
-      run:
-        - python
+  run:
+    - python
 
-    test:
-      imports:
-        - faker
+test:
+  imports:
+    - faker
 
-    about:
-      home: http://www.joke2k.net/faker
-      license: MIT
+about:
+  home: http://www.joke2k.net/faker
+  license: MIT
+```
 
-With a search on github and some sensible choices for substitutions, I get a
-makeshift .yaml for music21:
+With a search on (github site of
+music21)[https://github.com/cuthbertLab/music21] and some sensible choices for
+substitutions, I get a makeshift .yaml for `music21`:
 
-    package:
-      name: music21
-      version: 1.8.1
+```
+package:
+  name: music21
+  version: 1.8.1
 
-    source:
-      git_tag: 1.8.1
-      git_url: https://github.com/cuthbertLab/music21/releases/download/v1.8.1/music21-1.8.1.tar.gz
+source:
+  git_tag: 1.8.1
+  git_url: https://github.com/cuthbertLab/music21/releases/download/v1.8.1/music21-1.8.1.tar.gz
 
-    requirements:
-      build:
-        - python
-        - distribute
+requirements:
+  build:
+    - python
+    - setuptools
 
-      run:
-        - python
+  run:
+    - python
 
-    test:
-      imports:
-        - music21
+test:
+  imports:
+    - music21
 
-    about:
-      home: https://github.com/cuthbertLab/music21
-      license: LGPL
+about:
+  home: https://github.com/cuthbertLab/music21
+  license: LGPL
+```
 
-This seems reasonable. Being sure to supply build.sh and bld.bat files in the
+This seems reasonable. Being sure to supply `build.sh` and `bld.bat` files in the
 same directory, I try:
 
-`$ conda build .`
+```
+$ cd ~/conda-recipes/music21/
+$ conda build .
+```
 
 and get a 403 error trying to access the repository. Now, with the benefit of
 comparison with the skeleton-generated file, I observe that the key difference
 is in the keywords that specify the git repository:
 
-      fn: music21-1.8.1.tar.gz
-      url: https://github.com/cuthbertLab/music21/releases/download/v1.8.1/music21-1.8.1.tar.gz
+```
+fn: music21-1.8.1.tar.gz
+url: https://github.com/cuthbertLab/music21/releases/download/v1.8.1/music21-1.8.1.tar.gz
+```
 
-versus
+versus:
 
-      git_tag: 1.8.1
-      git_url: https://github.com/cuthbertLab/music21/releases/download/v1.8.1/music21-1.8.1.tar.gz
+```
+git_tag: 1.8.1
+git_url: https://github.com/cuthbertLab/music21/releases/download/v1.8.1/music21-1.8.1.tar.gz
+```
 
-**What is the significance of this difference, and how should I know which set
-of keywords to use?** But with this substitution, it works, and I have a conda
-package as desired.
+To answer of question what parameters should be used with what values, you will
+find on page dedicated to (conda build
+framework)[http://conda.pydata.org/docs/build.html].
 
 Building from locally compiled source distribution
 --------------------------------------------------
@@ -276,20 +479,91 @@ Building from locally compiled source distribution
 **The next step will be building from source without the training wheels of
 skeleton or pip. Perhaps this is the place to slot in the continuum library?**
 
+Uploading own packages to (binstar.org)[https://binstar.org]
+============================================================
+
+All of above steps produce one object - the package (tar archive compressed by
+bzip2). During package building process we were asked if the package should be
+uploaded to (binstar.org)[https://binstar.org]. To get more info about
+(binstar.org)[https://binstar.org] and possibility of uploading packages,
+please visit it's (documentation page)[http://docs.binstar.org/].
+
+Here is a minimal summary. First, we need a `binstar` client. We will install
+this tool by running:
+
+```
+conda install binstar
+```
+
+Now we should (register our account on binstar.org site)[https://binstar.org/account/register]
+and generate appropriate access TOKEN. If we already performed all
+of this steps we are ready to upload our own package.
+We have two ways to do this. The first option is to say `yes` during the build process.
+This means you can re-run below commands one more time, but you have to agree with uploading:
+
+```
+$ cd ~/conda-recipes/music21/
+$ conda build .
+```
+
+The second way is to explicitly upload alredy built package. You can do this by:
+
+```
+$ binstar login
+$ binstar upload ~/miniconda/conda-bld/linux-64/music21-1.8.1-py27_0.tar.bz
+```
+
+Searching for already existing packages
+---------------------------------------
+
+We have two methods to accomplish this task. First option is to use `search`
+conda's subcommand. You have to know that when this operation is requested then
+`conda` checks all available channels with packages (these channels are setup in
+`.condarc` file) in search of desired package.
+
+Original`.condarc` file contains only default channels with bunch of software
+officially maintained by (Continuum Analytics)[http://continuum.io/]. This means we can
+easily search for all packages from Anaconda's distribution. Therefore to
+perform this search, please type (here I'm looking for the `cmake` package):
+
+```
+conda search cmake
+```
+
+Sometimes we known that some person is constantly building new packages (and of
+course publishing them on (binstar.org)[https://binstar.org]) hosting service.
+To be able to use those packages we have to add appropriate channel of that
+person to our `.condarc` file, just like this:
+
+```
+channels:
+    - defaults
+    - http://conda.binstar.org/travis
+    - http://conda.binstar.org/mutirri
+```
+
+In above example I have added two new channels (of user travis and user mutirri).
+From now on I'm able to search for any requested package in these users package list (and of course I can install them also).
+
+However, what I should do if I want to search through all channels without explicitly add them to my `.condarc` file?
+Here is the answer:
+
+```
+$ binstar search cmake
+```
+
+This command will search through all users packages on (binstar.org)[http://binstar.org].
+**But remember**, to be able to install any of package which was found in this
+way, you still have to add appropriate user's channel to `.condarc` file.
+
+More info about this topic can be found directly on (binstar.org documentation page)[http://docs.binstar.org/].
+
 Issues/ Weird Stuff/ Needs Attention
 ====================================
 
 * conda-build splashes error asking for `conda install jinja2` to enable jinja
   template support. Build proceeds to completion without, but fails if it's
   installed with an error `unable to load pkg_resources`.
-
-* Difference/ relationship between `conda build .` and `conda-build .`?
-
-* How should a user intelligently search for existing packages without advance
-  knowledge of all the channels they ought to search. Is there a utility that
-  crawls binstar or a protocol for package builders to register their packages
-  in a central place that can be accessed by conda search (if particular
-  channels have not already been added)?
 
 * I have seen versions of this question on the support lists. If a user needs
   to maintain a conda environment with additional packages outside of conda
