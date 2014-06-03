@@ -4,11 +4,11 @@ Introduction
 Overview
 --------
 
-Let's set out to build postgis. This package is installable with conda if you
+Let's set out to build `postgis`. This package is installable with conda if you
 have access to an appropriate channel, so we are not flying blind. But we'll
 start out naively and try to learn some things along the way.
 
-We will build postgis 2.1.2 (the current version as of 30 April 2014).
+We will build `postgis` 2.1.2 (the current version as of 30 April 2014).
 
 The step-by-step sequence is fairly repetitive in the sense that there are only
 a few sequences of actions you must take to build conda packages, although you
@@ -20,21 +20,30 @@ process considerably.
 Abstract Description of conda build
 -----------------------------------
 
-We begin building a package by pointing conda to a directory with a build.sh
-(for Linux) and meta.yaml file. Respectively, these files specify the command
+We begin building a package by pointing conda to a directory with a `build.sh`
+(for Linux) and `meta.yaml` file. Respectively, these files specify the command
 line instructions to build a particular package from source, and information
 about where to download the source files and dependencies that the package
-requires. If these files are configured correctly, `$ conda build .` obtains
-the source files from the location specified in meta.yaml and, following the
-commands in build.sh, builds the package locally. During this process, conda
+requires. If these files are configured correctly,
+
+```
+$ conda build .
+```
+
+obtains the source files from the location specified in `meta.yaml` and, following the
+commands in `build.sh`, builds the package locally. During this process, conda
 generates metadata about the build and sets up relocatable links (relative to
 the local build) so that the package, once built, is transportable. Once
 complete, the package build plus all conda-created metadata is bundled and
-uploaded to binstar, where it can be access via `$ conda search` and `$ conda
-install` commands.
+uploaded to binstar, where it can be access via below commands:
 
-Here, we'll start out naively and make adjustments to the build.sh and
-meta.yaml files as we go, until the package is successfully built.
+```
+$ conda search
+$ conda install
+```
+
+Here, we'll start out naively and make adjustments to the `build.sh` and
+`meta.yaml` files as we go, until the package is successfully built.
 
 Build Steps
 ===========
@@ -43,24 +52,28 @@ Initial Setup
 -------------
 
 Locate source files for the package you want to build. In this case, I found a
-postgis
+`postgis`
 [tarball](http://download.osgeo.org/postgis/source/postgis-2.1.2.tar.gz) here.
 Reading the documentation, I can already see there are dependencies, but for
 the purposes of illustrating the steps, we will start at zero and see how far
 we get.
 
-Create a directory where conda build will find the build.sh and meta.yaml files. Create files with the following bare-bones contents (appropriate to the package you are tyring to build):
+Create a directory where conda build will find the `build.sh` and `meta.yaml`
+files. Create files with the following bare-bones contents (appropriate to the
+package you are tyring to build):
 
-    $ mkdir postgis
-    $ cd postgis
-    $ ls
-    build.sh  meta.yaml
-    $ more build.sh
-    #!/bin/sh
+```
+$ mkdir postgis
+$ cd postgis
+$ ls
+build.sh  meta.yaml
+$ more build.sh
+#!/bin/sh
 
-    ./configure --prefix=$PREFIX
-    make
-    make install
+./configure --prefix=$PREFIX
+make
+make install
+```
 
 This is the minimal set of commands that might build a package from source that
 was created with autotools (autoconf, automake, etc), the standard format
@@ -70,31 +83,36 @@ you'll encounter for packaging source code distributions. Including
 instruction to have conda configure and install locally, rather than try to
 access root-level directories such as /usr, which is the default installation
 path. If you want to follow more details of what conda is doing to configure
-the environment, add to your buid.sh file
+the environment, add to your buid.sh file:
 
-    echo $PREFIX
+```
+echo $PREFIX
+```
 
-The basic meta.yaml file looks like this:
-    $ more meta.yaml
-    package:
-      name: postgis
-      version: 2.1.2
+The basic `meta.yaml` file looks like this:
 
-    source:
-      fn: postgis-2.1.2.tar.gz
-      url: http://download.osgeo.org/postgis/source/postgis-2.1.2.tar.gz
+```
+$ more meta.yaml
+package:
+  name: postgis
+  version: 2.1.2
 
-    build:
-      number: 0
+source:
+  fn: postgis-2.1.2.tar.gz
+  url: http://download.osgeo.org/postgis/source/postgis-2.1.2.tar.gz
 
-    #requirements:
-    #  build:
-    #
-    #  run:
+build:
+  number: 0
 
-    about:
-      home: http://postgis.net
-      license: GPL2
+#requirements:
+#  build:
+#
+#  run:
+
+about:
+  home: http://postgis.net
+  license: GPL2
+```
 
 The dependencies will be listed under the requirements key, but that is
 commented out for now as we are assuming no dependencies at first.
@@ -102,13 +120,16 @@ commented out for now as we are assuming no dependencies at first.
 First Build Attempt
 -------------------
 
-Try
-    $ conda build .
+In `postgis` directory, try:
+
+```
+$ conda build .
+```
 
 If you are familiar building packages from source, you will recognize the log
 generated by the configure script. The first error message I encounter is
-configure: error: could not find pg_config within the current path. You may
-need to try re-running configure with a --with-pg_config parameter.  Command
+`configure: error: could not find pg_config within the current path`. You may
+need to try re-running configure with a `--with-pg_config` parameter.  Command
 failed: /bin/bash -x -e /media/data/code/sandbox/postgis_2.1.2/build.sh
 
 I'm being asked to specify a path to the utility pg_config. I do `$ which
@@ -144,9 +165,11 @@ which I can verify by inspecting
 
 Now:
 
-    $ conda install -c https://conda.binstar.org/trent postgresql
-    Fetching package metadata: ....
-    Error: No packages found matching: postgresql
+```
+$ conda install -c https://conda.binstar.org/trent postgresql
+Fetching package metadata: ....
+Error: No packages found matching: postgresql
+```
 
 Huh. This is a little confounding given what I read [here](https://binstar.org/trent/postgresql).
 
@@ -406,6 +429,7 @@ and include -gdal as a requirement in meta.yaml, as well as add the flag
 
 and that should be the one that works!
 
+```
     patchelf: file: /home/gergely/code/miniconda/envs/_build/bin/pgsql2shp
         setting rpath to: $ORIGIN/../lib
     patchelf: file: /home/gergely/code/miniconda/envs/_build/bin/raster2pgsql
@@ -426,6 +450,7 @@ and that should be the one that works!
     #
     # To have conda build upload to binstar automatically, use
     # $ conda config --set binstar_upload yes
+```
 
 If you'd methodically followed along, you now have a postgis package you can
 upload and install. Along the way, you've created several other conda packages
