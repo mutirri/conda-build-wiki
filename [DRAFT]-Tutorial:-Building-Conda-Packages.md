@@ -83,14 +83,14 @@ installation (this will be installation of `chrpath` from official conda
 repositories).
 
 Besides, during below building processes you will be asked to upload packages to
-(binstar.org)[https://binstar.org] hosting service. For now please just say no (or add
+[binstar.org](https://binstar.org) hosting service. For now please just say no (or add
 `--no-binstar-upload` option to `build` conda's subcommand or `conda-build`
 command).
 
 Install conda and conda-build
 -----------------------------
 
-conda is installed as part of (Continuum's Anaconda)[https://store.continuum.io/cshop/anaconda/]
+conda is installed as part of [Continuum's Anaconda](https://store.continuum.io/cshop/anaconda/)
 distribution and used to manage changes thereto. A lightweight [python + conda
 standalone distribution](http://conda.pydata.org/miniconda.html) is also
 available, which is what we'll assume here. Upon downloading the installer
@@ -106,7 +106,7 @@ and run it in a working directory:
 $ ./Miniconda-3.5.2-Linux-x86_64.sh
 ```
 
-The list of all `miniconda` releases is available (here)[http://repo.continuum.io/miniconda/].
+The list of all `miniconda` releases is available [here](http://repo.continuum.io/miniconda/).
 
 A fundamental design philosophy of conda is that users should have a fully
 functioning programming environment in their home or working directory without
@@ -146,8 +146,8 @@ $ conda update conda
 with a fresh install. You can issue to update command for any installed
 package, including conda itself. This intrinsic bootstrapping capacity makes
 conda very powerful. In fact, if you started with the miniconda installation,
-you can expand it to the full (Anaconda
-distribution)[https://store.continuum.io/cshop/anaconda/] with:
+you can expand it to the full [Anaconda
+distribution](https://store.continuum.io/cshop/anaconda/) with:
 
 ```
 $ conda install anaconda
@@ -209,7 +209,7 @@ Trivial
 
 The simplest examples are very trivial. With a correct meta.yaml file and a
 properly bundled binary distribution hosted on
-(binstar.org)[https://binstar.org], this can be a one-liner (e.g. Trent's ppt
+[binstar.org](https://binstar.org), this can be a one-liner (e.g. Trent's ppt
 demo with pyfaker):
 
 ```
@@ -229,7 +229,7 @@ $ python> import faker
 Using conda skeleton to build from a PyPi package
 -------------------------------------------------
 
-First, confirm that the package is hosted by (PyPi)[https://pypi.python.org/]. Here I
+First, confirm that the package is hosted by [PyPi](https://pypi.python.org/). Here I
 use the `music21` package, motivated by a [recent
 request](https://groups.google.com/a/continuum.io/forum/#!searchin/anaconda/conda$20package/anaconda/yu2ZKPI3ixU/VSWejiDoXlQJ)
 on the [Anaconda support
@@ -250,16 +250,16 @@ $ source activate tstenv
 $ which pip
 ```
 
-After that I can check `music21` package from PyPi)[https://pypi.python.org/]:
+After that I can check `music21` package from [PyPi](https://pypi.python.org/):
 
 ```
 pip install --allow-all-external music21
 ```
 
 In this particular case where `music21` sources are placed on a remote
-host (not on (PyPi)[https://pypi.python.org/] itself), the
+host (not on [PyPi](https://pypi.python.org/) itself), the
 `--allow-all-external` option is mandatory.  Normally most packages sources are
-directly available on (PyPi)[https://pypi.python.org/], so mentioned option
+directly available on [PyPi](https://pypi.python.org/), so mentioned option
 maybe omitted.
 
 To verify if a package was properly installed, please just type:
@@ -291,7 +291,7 @@ $ conda remove --all tstenv
 $ conda info -e
 ```
 
-and generate a new conda recipe for `music21` package, by using (PyPi)[https://pypi.python.org/]] metadata:
+and generate a new conda recipe for `music21` package, by using [PyPi](https://pypi.python.org/) metadata:
 
 ```
 $ cd ~/conda-recipes
@@ -415,8 +415,8 @@ about:
   license: MIT
 ```
 
-With a search on (github site of
-music21)[https://github.com/cuthbertLab/music21] and some sensible choices for
+With a search on [github site of
+music21](https://github.com/cuthbertLab/music21) and some sensible choices for
 substitutions, I get a makeshift .yaml for `music21`:
 
 ```
@@ -470,8 +470,8 @@ git_url: https://github.com/cuthbertLab/music21/releases/download/v1.8.1/music21
 ```
 
 To answer of question what parameters should be used with what values, you will
-find on page dedicated to (conda build
-framework)[http://conda.pydata.org/docs/build.html].
+find on page dedicated to [conda build
+framework](http://conda.pydata.org/docs/build.html).
 
 Building from locally compiled source distribution
 --------------------------------------------------
@@ -479,14 +479,14 @@ Building from locally compiled source distribution
 **The next step will be building from source without the training wheels of
 skeleton or pip. Perhaps this is the place to slot in the continuum library?**
 
-Uploading own packages to (binstar.org)[https://binstar.org]
+Uploading own packages to [binstar.org](https://binstar.org)
 ============================================================
 
 All of above steps produce one object - the package (tar archive compressed by
 bzip2). During package building process we were asked if the package should be
-uploaded to (binstar.org)[https://binstar.org]. To get more info about
-(binstar.org)[https://binstar.org] and possibility of uploading packages,
-please visit it's (documentation page)[http://docs.binstar.org/].
+uploaded to [binstar.org](https://binstar.org). To get more info about
+[binstar.org](https://binstar.org) and possibility of uploading packages,
+please visit it's [documentation page](http://docs.binstar.org/).
 
 Here is a minimal summary. First, we need a `binstar` client. We will install
 this tool by running:
@@ -495,7 +495,7 @@ this tool by running:
 conda install binstar
 ```
 
-Now we should (register our account on binstar.org site)[https://binstar.org/account/register]
+Now we should [register our account on binstar.org site](https://binstar.org/account/register)
 and generate appropriate access TOKEN. If we already performed all
 of this steps we are ready to upload our own package.
 We have two ways to do this. The first option is to say `yes` during the build process.
@@ -522,7 +522,7 @@ conda's subcommand. You have to know that when this operation is requested then
 `.condarc` file) in search of desired package.
 
 Original`.condarc` file contains only default channels with bunch of software
-officially maintained by (Continuum Analytics)[http://continuum.io/]. This means we can
+officially maintained by [Continuum Analytics](http://continuum.io/). This means we can
 easily search for all packages from Anaconda's distribution. Therefore to
 perform this search, please type (here I'm looking for the `cmake` package):
 
@@ -531,7 +531,7 @@ conda search cmake
 ```
 
 Sometimes we known that some person is constantly building new packages (and of
-course publishing them on (binstar.org)[https://binstar.org]) hosting service.
+course publishing them on [binstar.org](https://binstar.org)) hosting service.
 To be able to use those packages we have to add appropriate channel of that
 person to our `.condarc` file, just like this:
 
@@ -552,11 +552,11 @@ Here is the answer:
 $ binstar search cmake
 ```
 
-This command will search through all users packages on (binstar.org)[http://binstar.org].
+This command will search through all users packages on [binstar.org](http://binstar.org).
 **But remember**, to be able to install any of package which was found in this
 way, you still have to add appropriate user's channel to `.condarc` file.
 
-More info about this topic can be found directly on (binstar.org documentation page)[http://docs.binstar.org/].
+More info about this topic can be found directly on [binstar.org documentation page](http://docs.binstar.org/).
 
 Issues/ Weird Stuff/ Needs Attention
 ====================================
