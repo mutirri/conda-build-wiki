@@ -21,7 +21,7 @@ Abstract Description of conda build
 -----------------------------------
 
 We begin building a package by pointing conda to a directory with a `build.sh`
-(for Linux and MacOSX, Windows uses bld.bat file) and `meta.yaml` file.
+(for Linux and MacOSX, Windows uses `bld.bat` file) and `meta.yaml` file.
 Respectively, these files specify the command line instructions to build a
 particular package from source, and information about where to download the
 source files and dependencies that the package requires. If these files are
@@ -66,8 +66,14 @@ package you are tyring to build):
 ```
 $ mkdir postgis
 $ cd postgis
+$ touch build.sh meta.yaml
 $ ls
 build.sh  meta.yaml
+```
+
+Now setup `build.sh` like this:
+
+```
 $ more build.sh
 #!/bin/sh
 
@@ -84,7 +90,7 @@ you'll encounter for packaging source code distributions. Including
 instruction to have conda configure and install locally, rather than try to
 access root-level directories such as `/usr`, which is the default installation
 path in normal circumstances. If you want to follow more details of what conda
-is doing to configure the environment, add to your buid.sh file:
+is doing to configure the environment, add to your `buid.sh` file:
 
 ```
 echo ${PREFIX}
@@ -130,7 +136,7 @@ configure: error: could not find pg_config within the current path.
 You may need to try re-running configure with a --with-pg_config parameter.
 ```
 
-I'm being asked to specify a path to the utility pg_config. I do `$ which
+I'm being asked to specify a path to the utility `pg_config`. I do `$ which
 pg_config` and find that it's not installed. The philosophy of conda packaging
 is that you bundle what you need, so this utility has to be included in the
 package. I do:
@@ -142,7 +148,7 @@ $ conda search pg_config
 and turn up nothing. Therefore I have to assume this package also needs to be
 built.
 
-Some searching indicates pg_config is distributed with postgresql, so let me
+Some searching indicates `pg_config` is distributed with `postgresql`, so let me
 check that out. A search on [binstar.org](https://binstar.org/) for conda
 packages with the name `postgresql` yields some appropriate result.
 
@@ -212,7 +218,7 @@ $ cp ../postgresql-9.3.4/meta.yaml .
 $ cp ../postgresql-9.3.4/build.sh .
 ```
 
-I edit the `meta.yamlq and `build.sh` files to reflect the details of this package (no dependencies or special flags set):
+I edit the `meta.yamlq` and `build.sh` files to reflect the details of this package (no dependencies or special flags set):
 
 ```
 $ conda build .
@@ -291,10 +297,10 @@ configure: error: could not find proj_api.h - you may need to specify the direct
 Build proj
 ----------
 
-proj-4.8.0 can be built from source in the same way. It should not have
+`proj-4.8.0` can be built from source in the same way. It should not have
 non-standard dependencies. I uploaded my package as proj and then did `$ conda
-install proj`. I include -proj under requirements in `meta.yaml` and add the flag
-`--with-projdir=${PREFIX}` in `build.sh`.
+install proj`. I include `- proj` under requirements in `meta.yaml` and add the flag
+`--with-projdir=${PREFIX}` in `build.sh` file.
 
 ```
 $ conda build .
@@ -316,7 +322,7 @@ The following packages will be linked:
 ERROR - gdal
 ------------
 
-Next I encounter:
+Next I encountered:
 
 ```
 checking for gdal-config... no
@@ -345,8 +351,8 @@ Yes, so I can do:
 $ conda install gdal
 ```
 
-and include -gdal as a requirement in `meta.yaml`, as well as add the flag
-`--with-gdalconfig=${PREFIX}/bin` in `build.sh`.
+and include `- gdal` as a requirement in `meta.yaml`, as well as add the flag
+`--with-gdalconfig=${PREFIX}/bin` in `build.sh` file.
 
 ```
 $ conda build .
@@ -359,8 +365,8 @@ ERROR - json-c
 configure: error: Cannot find json dev files in "/home/irritum/anaconda/envs/_build"
 ```
 
-After doing some searching (mostly documentation of `postgis`) I have found
-that I need a json-c package. So, once again:
+After doing some research (mostly documentation of `postgis`), I have found
+that I need a `json-c` package. So, once again:
 
 ```
 $ conda search json-c
@@ -372,7 +378,7 @@ Notice that in my `.condarc` file I have trent channel, where `json-c` is availa
 I'm gonna use it, so I add:
 
 ```
---with-jsondir=$PREFIX
+--with-jsondir=${PREFIX}
 ```
 
 to `build.sh` and:
@@ -424,7 +430,7 @@ And `build.sh`:
     --with-pgconfig=${PREFIX}/bin/pg_config \
     --with-geosconfig=${PREFIX}/bin/geos-config \
     --with-projdir=${PREFIX} \
-    --with-jsondir=${PREFIX} \
+    --with-jsondir=${PREFIX}
 
 make || exit 1
 make install || exit 1
@@ -439,14 +445,14 @@ Try again:
 $ conda build .
 ```
 
-The next error message from configure is:
+The next error message from `configure` is:
 
 ```
 checking for xml2-config... no
 configure: error: could not find xml2-config from libxml2 within the current path. You may need to try re-running configure with a --with-xml2config parameter.
 ```
 
-I need to install libxml2. See if it's available:
+I need to install `libxml2` package. See if it's available:
 
 ```
 $ conda search libxml2
@@ -456,7 +462,7 @@ libxml2                   .  2.9.0                         0  defaults
 $ conda install libxml2
 ```
 
-I accordingly update the `meta.yaml` file to include `-libxml2` in the build and run requirements:
+I accordingly update the `meta.yaml` file to include `- libxml2` in the `build.sh` file and re-run whole process one more time:
 
 ```
 $ conda build .
