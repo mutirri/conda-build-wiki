@@ -555,6 +555,20 @@ $ binstar search cmake
 This command will search through all users packages on [binstar.org](http://binstar.org).
 **But remember**, to be able to install any of package which was found in this
 way, you still have to add appropriate user's channel to `.condarc` file.
+The another way to do this, is to run the conda tool with a special option (use
+mutirri's channel and `music21` package in this case):
+
+```
+$ conda install --channel http://conda.binstar.org/mutirri music21
+```
+
+or even shorter:
+
+```
+$ conda install --channel mutirri music21
+```
+
+what means exactly the same thing.
 
 More info about this topic can be found directly on [binstar.org documentation page](http://docs.binstar.org/).
 
