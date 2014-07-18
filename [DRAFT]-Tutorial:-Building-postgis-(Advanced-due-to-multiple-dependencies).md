@@ -90,7 +90,7 @@ you'll encounter for packaging source code distributions. Including
 instruction to have conda configure and install locally, rather than try to
 access root-level directories such as `/usr`, which is the default installation
 path in normal circumstances. If you want to follow more details of what conda
-is doing to configure the environment, add to your `buid.sh` file:
+is doing to configure the environment, add to your `build.sh` file:
 
 ```
 echo ${PREFIX}
@@ -218,7 +218,7 @@ $ cp ../postgresql-9.3.4/meta.yaml .
 $ cp ../postgresql-9.3.4/build.sh .
 ```
 
-I edit the `meta.yamlq` and `build.sh` files to reflect the details of this package (no dependencies or special flags set):
+I edit the `meta.yaml` and `build.sh` files to reflect the details of this package (no dependencies or special flags set):
 
 ```
 $ conda build .
@@ -276,7 +276,7 @@ A Reminder
 
 As you go through this cycle of steps, remember to update the conda build
 recipes to reflect the dependencies that you are installing. You may install
-packages, but if the build recipes dot reflect it, you will still encounter
+packages, but if the build recipes do not reflect it, you will still encounter
 errors. For example, if you have installed a geos package but not specified the
 requirement in `meta.yaml` or the path flag in `build.sh`, you will see an error
 like this:
@@ -375,7 +375,7 @@ json-c                       0.11.20130402                 0  http://conda.binst
 ```
 
 Notice that in my `.condarc` file I have trent channel, where `json-c` is available.
-I'm gonna use it, so I add:
+I'm going to use it, so I add:
 
 ```
 --with-jsondir=${PREFIX}
