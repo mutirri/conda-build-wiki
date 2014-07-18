@@ -209,27 +209,26 @@ Trivial
 
 The simplest examples are very trivial. With a correct meta.yaml file and a
 properly bundled binary distribution hosted on
-[binstar.org](https://binstar.org), this can be a one-liner (e.g. Trent's ppt
-demo with pyfaker):
+[binstar.org](https://binstar.org), this can be a one-liner:
 
 ```
 $ cd ~/conda-recipes/pyfaker
 $ conda build .
 ```
 
-The result of above operation - the package - will be saved in ~/miniconda/conda-bld/linux-64/music21-0.3.2-py27_0.tar.bz2 file.
+The result of above operation - the package - will be saved in ~/miniconda/conda-bld/linux-64/pyfaker-0.3.2-py27_0.tar.bz2 file.
 You can easily install this in global miniconda environment:
 
 ```
-$ conda install ~/miniconda/conda-bld/linux-64/music21-0.3.2-py27_0.tar.bz2
+$ conda install ~/miniconda/conda-bld/linux-64/pyfaker-0.3.2-py27_0.tar.bz2
 $ python
 $ python> import faker
 ```
 
-Using conda skeleton to build from a PyPi package
+Using conda skeleton to build from a PyPI package
 -------------------------------------------------
 
-First, confirm that the package is hosted by [PyPi](https://pypi.python.org/). Here I
+First, confirm that the package is hosted by [PyPI](https://pypi.python.org/). Here I
 use the `music21` package, motivated by a [recent
 request](https://groups.google.com/a/continuum.io/forum/#!searchin/anaconda/conda$20package/anaconda/yu2ZKPI3ixU/VSWejiDoXlQJ)
 on the [Anaconda support
@@ -250,16 +249,16 @@ $ source activate tstenv
 $ which pip
 ```
 
-After that I can check `music21` package from [PyPi](https://pypi.python.org/):
+After that I can check `music21` package from [PyPI](https://pypi.python.org/):
 
 ```
 pip install --allow-all-external music21
 ```
 
 In this particular case where `music21` sources are placed on a remote
-host (not on [PyPi](https://pypi.python.org/) itself), the
+host (not on [PyPI](https://pypi.python.org/) itself), the
 `--allow-all-external` option is mandatory.  Normally most packages sources are
-directly available on [PyPi](https://pypi.python.org/), so mentioned option
+directly available on [PyPI](https://pypi.python.org/), so mentioned option
 maybe omitted.
 
 To verify if a package was properly installed, please just type:
@@ -287,11 +286,11 @@ you can remove our virtual environment:
 
 ```
 $ source deactivate
-$ conda remove --all tstenv
+$ conda remove -n tstenv --all
 $ conda info -e
 ```
 
-and generate a new conda recipe for `music21` package, by using [PyPi](https://pypi.python.org/) metadata:
+and generate a new conda recipe for `music21` package, by using [PyPI](https://pypi.python.org/) metadata:
 
 ```
 $ cd ~/conda-recipes
@@ -321,7 +320,7 @@ source:
   md5: b88f74b8a3940e4bca89d90158432ee0
 ```
 
-Generally speaking, User should always check saved in `meta.yaml` file output from the
+Generally speaking, User should always check the `meta.yaml` file output from the
 `skeleton` subcommand invocation.
 
 Now, it should be straightforward to use the `conda-build` tool. Let's try it:
@@ -506,7 +505,7 @@ $ cd ~/conda-recipes/music21/
 $ conda build .
 ```
 
-The second way is to explicitly upload alredy built package. You can do this by:
+The second way is to explicitly upload the already built package. You can do this by:
 
 ```
 $ binstar login
@@ -521,7 +520,7 @@ conda's subcommand. You have to know that when this operation is requested then
 `conda` checks all available channels with packages (these channels are setup in
 `.condarc` file) in search of desired package.
 
-Original`.condarc` file contains only default channels with bunch of software
+Original `.condarc` file contains only default channels with software
 officially maintained by [Continuum Analytics](http://continuum.io/). This means we can
 easily search for all packages from Anaconda's distribution. Therefore to
 perform this search, please type (here I'm looking for the `cmake` package):
@@ -592,5 +591,5 @@ Issues/ Weird Stuff/ Needs Attention
 References
 ==========
 
-[Using PyPi packages for conda](http://www.linkedin.com/today/post/article/20140107182855-25278008-using-pypi-packages-with-conda)
+[Using PyPI packages for conda](http://www.linkedin.com/today/post/article/20140107182855-25278008-using-pypi-packages-with-conda)  
 [music21 inquiry on support list](https://groups.google.com/a/continuum.io/forum/#!searchin/anaconda/conda$20package/anaconda/yu2ZKPI3ixU/VSWejiDoXlQJ)
