@@ -221,8 +221,7 @@ You can easily install this in global miniconda environment:
 
 ```
 $ conda install ~/miniconda/conda-bld/linux-64/pyfaker-0.3.2-py27_0.tar.bz2
-$ python
-$ python> import faker
+$ python -c 'import faker; print "Successfully imported faker"'
 ```
 
 Using conda skeleton to build from a PyPI package
@@ -252,7 +251,7 @@ $ which pip
 After that I can check `music21` package from [PyPI](https://pypi.python.org/):
 
 ```
-pip install --allow-all-external music21
+$ pip install --allow-all-external music21
 ```
 
 In this particular case where `music21` sources are placed on a remote
@@ -264,14 +263,7 @@ maybe omitted.
 To verify if a package was properly installed, please just type:
 
 ```
-python
-```
-
-and then, inside the interpreter:
-
-
-```
-import music21
+$ python -c 'import music21; print "Successfully imported music21"'
 ```
 
 Don't bother about warning which says:
@@ -293,7 +285,7 @@ $ conda info -e
 and generate a new conda recipe for `music21` package, by using [PyPI](https://pypi.python.org/) metadata:
 
 ```
-$ cd ~/conda-recipes
+$ cd ~/
 $ conda skeleton pypi music21 --no-download
 ```
 
@@ -326,7 +318,7 @@ Generally speaking, User should always check the `meta.yaml` file output from th
 Now, it should be straightforward to use the `conda-build` tool. Let's try it:
 
 ```
-$ cd ~/conda-recipes/music21/
+$ cd ~/music21/
 $ conda build .
 ```
 
@@ -338,7 +330,7 @@ Traceback (most recent call last):
   File "setup.py", line 14, in <module>
     from setuptools import setup, find_packages
 ImportError: No module named setuptools
-Command failed: /bin/bash -x -e /home/irritum/conda-recipes/music21/build.sh
+Command failed: /bin/bash -x -e /home/irritum/music21/build.sh
 ```
 
 So, now I should add appropriate requirement to auto generated `meta.yaml` file.
@@ -373,8 +365,7 @@ So, now I want to install `music21` package:
 
 ```
 $ conda install ~/miniconda/conda-bld/linux-64/music21-1.8.1-py27_0.tar.bz
-$ python
-$ python> import music21
+$ python -c 'import music21; print "Successfully imported music21"'
 ```
 
 That's it :)
@@ -448,7 +439,7 @@ This seems reasonable. Being sure to supply `build.sh` and `bld.bat` files in th
 same directory, I try:
 
 ```
-$ cd ~/conda-recipes/music21/
+$ cd ~/music21/
 $ conda build .
 ```
 
@@ -501,7 +492,7 @@ We have two ways to do this. The first option is to say `yes` during the build p
 This means you can re-run below commands one more time, but you have to agree with uploading:
 
 ```
-$ cd ~/conda-recipes/music21/
+$ cd ~/music21/
 $ conda build .
 ```
 
