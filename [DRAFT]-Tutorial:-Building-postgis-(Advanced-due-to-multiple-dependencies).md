@@ -141,21 +141,34 @@ pg_config` and find that it's not installed. The philosophy of conda packaging
 is that you bundle what you need, so this utility has to be included in the
 package. I do:
 
-```
-$ conda search pg_config
-```
-
-and turn up nothing. Therefore I have to assume this package also needs to be
-built.
-
-Some searching indicates `pg_config` is distributed with `postgresql`, so let me
-check that out. A search on [binstar.org](https://binstar.org/) for conda
-packages with the name `postgresql` yields some appropriate result.
-
-Therefore:
+Some searching indicates pg_config is distributed with postgresql, so let me
+check that out. A search on (binstar.org)[https://binstar.org/] for conda
+packages with the name `postgresql` yields some results. I'll try to install
+from one of the binstar channels. First the channel must be added with:
 
 ```
-$ conda install postgresql
+$ conda config --add channels https://conda.binstar.org/trent
+```
+
+which I can verify by inspecting:
+
+```
+$ conda info
+Current conda install:
+
+             platform : linux-64
+        conda version : 3.5.2
+       python version : 2.7.7.final.0
+     root environment : /home/irritum/miniconda  (writable)
+  default environment : /home/irritum/miniconda
+     envs directories : /home/irritum/miniconda/envs
+        package cache : /home/irritum/miniconda/pkgs
+         channel URLs : http://repo.continuum.io/pkgs/free/linux-64/
+                        http://repo.continuum.io/pkgs/pro/linux-64/
+                        http://repo.continuum.io/pkgs/gpl/linux-64/
+                        http://conda.binstar.org/mutirri/linux-64/
+          config file : /home/irritum/.condarc
+    is foreign system : False
 ```
 
 Above command works without any problems and `postgresql` package is now available in my environment.
