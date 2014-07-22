@@ -8,7 +8,7 @@ The basic steps are as follows (for a Linux environment):
 3. Create a tarball of the distribution.
 4. Create and edit conda build files: `meta.yaml`, `build.sh`, `bld.bat`.
 5. Perform the package build with conda.
-6. Place the package in a repository on (binstar.org)[https://binstar.org/].
+6. Place the package in a repository on [binstar.org](https://binstar.org/).
 7. Add the channel and conda install!
 
 **Using tpn's continuum library of python utilities, here's what this looks like, step by step.**
@@ -19,6 +19,8 @@ The basic steps are as follows (for a Linux environment):
 Our initial setup is a collection of .py files in a directory:
 
 ```
+$ cd ~/
+$ git clone https://github.com/tpn/python-libcontinuum
 $ cd python-libcontinuum/
 $ ls -R
 .:
@@ -39,7 +41,7 @@ We'll create a new directory and assemble everything we want:
 ```
 $ mkdir continuum-python
 $ cp -r python-libcontinuum/lib continuum-python/
-$ ls -R continuum-python
+$ ls -R continuum-python/
 .:
 continuum
 
@@ -52,17 +54,31 @@ command.py           config.py    __init__.pyc  logic.pyc     util.py
 2. Add and edit setup.py, and test it
 -------------------------------------
 
-Now we need to place a setup.py file in the top-level directory of the package.
+Now we need to place a `setup.py` file in the top-level directory of the package.
 I took one from a similar distribution and copied it, then edited by hand.
+More information about writing `setup.py` can be found [here](https://docs.python.org/3/distutils/setupscript.html).
 
 ```
-$ cd continuum-python
-$ cp ../some_other_package/setup.py .
+$ cd continuum-python/
+$ more setup.py
+#!/usr/bin/env python
+
+from distutils.core import setup
+
+setup(
+    name='continuum',
+    version='0.1.0',
+    description='Continuum library of python utilities',
+    author='Continuum Analytics',
+    author_email='support@continuum.io',
+    url='https://github.com/tpn/python-libcontinuum',
+)
+
 ```
 
 Basic edits involve substituting your package name and details about the
-author, version, license, etc. Note that setup.py makes use of a file called
-_version.py in the source directory. This file should be edited or created with
+author, version, license, etc. Note that `setup.py` makes use of a file called
+`_version.py` in the source directory. This file should be edited or created with
 this result:
 
 ```
@@ -71,7 +87,7 @@ __version_info__ = (0, 1, 0)
 __version__ = '.'.join(str(x) for x in __version_info__)
 ```
 
-where the tuple __version_info__ contains the correct version for your software.
+where the tuple `__version_info__` contains the correct version for your software.
 
 Verify that the build and install commands function correctly:
 
@@ -91,8 +107,8 @@ assembled:
 
 ```
 $ pwd
-~/sandbox/continuum-python
-$ tar -czvf continuum.tar.gz ./*
+~/continuum-python
+$ tar -czvf ../continuum.tar.gz ./*
 ./*
 ./continuum/
 ./continuum/cli.py
@@ -118,15 +134,17 @@ $ tar -czvf continuum.tar.gz ./*
 4. Create and edit conda build files: meta.yaml, build.sh, bld.bat
 ------------------------------------------------------------------
 
-Create a build directory and include in it the conda build files (steal 'em
-from somewhere).
+Create a build directory and include in it the conda build files (just steal 'em
+from somewhere - for example from one of directory in
+[conda-recipes repository](https://github.com/conda/conda-recipes)).
 
 ```
+$ cd ../
 $ mkdir continuum-build-trial
 $ cd continuum-build-trial/
-$ cp ../continuum-conda-pkg/meta.yaml .
-$ cp ../continuum-conda-pkg/build.sh .
-$ cp ../continuum-conda-pkg/bld.bat .
+$ cp ../some-continuum-conda-pkg/meta.yaml .
+$ cp ../some-continuum-conda-pkg/build.sh .
+$ cp ../some-continuum-conda-pkg/bld.bat .
 ```
 
 Special Case - Building locally
@@ -136,10 +154,10 @@ This can be built from a local tarball. In that case, it needs to also be
 placed in the build directory...
 
 ```
-$ cp ../cotinuum-python/continuum.tar.gz .
+$ cp ../continuum.tar.gz .
 ```
 
-... and the conda build files look like this:
+... and the conda build files should look like this:
 
 
 ```
@@ -163,26 +181,27 @@ requirements:
 
 test:
   imports:
-    - continuum
+    #- continuum
 
 about:
   home: https://github.com/tpn/python-libcontinuum
   license: LGPL
 ```
 
-Note that no source keynames are specified. This requires modifying build.sh to
+Note that no source keynames are specified. This requires modifying `build.sh` to
 locate and situate the tarball correctly, along these lines:
 
 ```
+$ chmod -v 755 build.sh
 $ more build.sh
 #!/bin/sh
 
-cp -r $RECIPE_DIR/* .
+cp -r ${RECIPE_DIR}/* .
 tar -zxvf continuum.tar.gz
-$PYTHON setup.py install
+${PYTHON} setup.py install
 ```
 
-If you have to hack at this, it's crucial to understand that $RECIPE_DIR (and
+If you have to hack at this, it's crucial to understand that ${RECIPE_DIR} (and
 other environment variables) are set by conda when the conda build command is
 executed, so you should expect different behavior running
 
@@ -195,10 +214,13 @@ hacking any necessary modifications should be done by calling `$ conda build .`
 and peppering build.sh with `ls` and `pwd` statements so you can track what
 it's doing.
 
+More information about conda's environment variables can be found
+[here](http://conda.pydata.org/docs/build.html).
+
 5. Perform the package build with conda
 ---------------------------------------
 
-If everything is set up right it is, as they say, as easy as
+If everything is set up right it is, as they say, as easy as:
 
 ```
 $ conda build .
@@ -207,36 +229,38 @@ $ conda build .
 6. Place the package in a repository on binstar
 -----------------------------------------------
 
-An account on binstar is required; users can request an account at binstar.org.
-Once approved and set up, use the binstar command line utility:
+An account on [binstar.org](https://binstar.org/account/login) is required.
+Once approved and set up, use the `binstar` command line utility:
 
 ```
 $ conda install binstar
 $ binstar login
-$ binstar upload /home/gergely/code/miniconda/conda-bld/linux-32/continuum-0.1.0-py27_0.tar.bz2
+$ binstar upload /home/irritum/miniconda/conda-bld/linux-64/continuum-0.1.0-py27_0.tar.bz2
 ```
 
 7. Add the channel and conda install
 ------------------------------------
 
 ```
-$ conda config --add channels johngergely
+$ conda config --add channels mutirri
 $ conda install continuum
 ```
+
+Where `mutirri` is equivalent of your registered account in [binstar.org](https://binstar.org/) service.
 
 It seems to work... but I think it's not right. This package seems to install
 but it's kind a hack. The way I got to this point requires an awkward kind of
 bootstrap.
 
-Initially all the source files are local, so once I've got setup.py tuned, I
-make a tarball. Then I set up the meta.yaml in a new directory without
+Initially all the source files are local, so once I've got `setup.py` tuned, I
+make a tarball. Then I set up the `meta.yaml` in a new directory without
 specifying a source (because it's all local, not in a repository yet) and copy
-the tarball there. I hack up the build.sh to unpack the local tarball and build
+the tarball there. I hack up the `build.sh` to unpack the local tarball and build
 from that.
 
-This is the thing that's packaged and hosted on binstar at the moment:
-https://binstar.org/johngergely/continuum/0.1.0/download/linux-32/continuum-0.1.0-py27_0.tar.bz2
+This is the thing that's packaged and hosted on [binstar.org](https://binstar.org/) at the moment:
+https://binstar.org/mutirri/continuum/0.1.0/download/linux-64/continuum-0.1.0-py27_0.tar.bz2
 and it seems to work. BUT it doesn't conform to the steps laid out in the docs.
-The problem is, how do you specify a url in the meta.yaml for the initial conda
+The problem is, how do you specify a url in the `meta.yaml` for the initial conda
 build **before** the package is uploaded yet?
 
