@@ -375,7 +375,7 @@ ERROR - json-c
 --------------
 
 ```
-configure: error: Cannot find json dev files in "/home/irritum/anaconda/envs/_build"
+configure: error: Cannot find json dev files in "/home/irritum/miniconda/envs/_build"
 ```
 
 After doing some research (mostly documentation of `postgis`), I have found
